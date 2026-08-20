@@ -359,11 +359,8 @@
 
     <!-- 🎒 インベントリ -->
     <div class="box">
-        <h3>インベントリ (<span id="inv-count">0</span>/<span id="inv-max">10</span>)</h3>
+        <h3>インベントリ (<span id="inv-count">0</span>/<span id="inv-max">350</span>)</h3>
         <div id="inventory"></div>
-        <div style="margin-top: 10px;">
-            <button onclick="expandInventory()" style="font-size: 0.85rem; border-color: #39ff14; color: #39ff14;">枠を拡張 (+5枠 / 50,000G〜)</button>
-        </div>
     </div>
 
     <!-- 🏛️ メダル博物館（ショップ） -->
@@ -382,7 +379,6 @@
     <div class="box" style="border-color: #00ffff;">
         <h3 style="color: #00ffff;">🧪 クラフトマシン (30分毎に切替)</h3>
         
-        <!-- 画像のデザインを再現したエリア -->
         <div style="margin: 12px 0; background: #111; padding: 12px; border-radius: 6px; font-family: 'Courier New', Courier, monospace;">
             <div id="craft-top-text" style="font-size: 0.95rem; color: #ffaa00; font-weight: bold;">素材読み込み中...</div>
             <div style="font-size: 1.2rem; margin: 4px 0; color: #00ffff; letter-spacing: 4px;">⬇ ⬇ ⬇</div>
@@ -394,7 +390,7 @@
 
     <script>
         let inventory = [];
-        let invMax = 10;
+        let invMax = 350;
         let coins = 500000;
         let richMedals = 0;
         let nationalMedals = 0;
@@ -428,7 +424,7 @@
                     const data = JSON.parse(saved);
                     coins = typeof data.coins === 'number' ? data.coins : 500000;
                     inventory = Array.isArray(data.inventory) ? data.inventory : [];
-                    invMax = typeof data.invMax === 'number' ? data.invMax : 10;
+                    invMax = 350; // 常に350に固定
                     richMedals = typeof data.richMedals === 'number' ? data.richMedals : 0;
                     nationalMedals = typeof data.nationalMedals === 'number' ? data.nationalMedals : 0;
                     
@@ -455,7 +451,6 @@
             }
         }
 
-        // --- サウンド生成エンジン ---
         let audioCtx = null;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -546,7 +541,6 @@
             { name: "👑【CRAFT】ツブヨンコ・ソラマメ", chance: 0, rarity: "craft", label: "CRAFT-GOD", cost: 0, dps: 50000 }
         ];
 
-        // 30分ごとに切り替わるクラフトレシピリスト（画像のデザイン形式に対応）
         const craftRecipes = [
             {
                 type: "char_medal",
@@ -697,7 +691,6 @@
             let totalDps = inventory.reduce((sum, item) => sum + item.dps, 0);
             document.getElementById('dps-display').innerText = totalDps;
 
-            // クラフト表示を画像のデザイン通りに反映
             const recipe = getCurrentRecipe();
             document.getElementById('craft-top-text').innerText = recipe.descTop;
             document.getElementById('craft-result-text').innerText = recipe.descResult;
@@ -745,19 +738,6 @@
             inventory.splice(idx, 1);
             updateDisplay();
             saveGame();
-        }
-
-        function expandInventory() {
-            let cost = invMax * 10000;
-            if (coins >= cost) {
-                coins -= cost;
-                invMax += 5;
-                alert("🎉 インベントリの枠を拡張しました！（上限: " + invMax + "個）");
-                updateDisplay();
-                saveGame();
-            } else {
-                alert(`❌ ゴールドが足りません！（必要: ${cost}G）`);
-            }
         }
 
         function buyRichMedal() {
@@ -844,7 +824,7 @@
                     localStorage.removeItem('soramameGameData');
                     coins = 500000;
                     inventory = [];
-                    invMax = 10;
+                    invMax = 350;
                     richMedals = 0;
                     nationalMedals = 0;
                     currentChar = null;
