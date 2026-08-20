@@ -19,7 +19,6 @@
             overflow-x: hidden;
         }
 
-        /* 左上のシークレットボタン */
         #secret-btn {
             position: fixed;
             top: 20px;
@@ -39,7 +38,6 @@
             color: #000;
         }
 
-        /* 右上のスマホボタン */
         #phone-btn {
             position: fixed;
             top: 20px;
@@ -230,13 +228,9 @@
 </head>
 <body>
 
-    <!-- 左上のシークレットボタン -->
     <button id="secret-btn" onclick="openSecretModal()" title="シークレットコード入力">🤫</button>
-
-    <!-- 右上のスマホボタン -->
     <button id="phone-btn" onclick="openScheduleModal()" title="イベント予定表">📱</button>
 
-    <!-- シークレットコード入力ダイアログ -->
     <dialog id="secret-dialog">
         <h3 style="color: #ff00ff; border-color: #ff00ff;">🤫 シークレットコード</h3>
         <p style="font-size: 0.85rem; color: #aaa;">隠されたコードを入力せよ……</p>
@@ -245,7 +239,6 @@
         <button onclick="closeSecretModal()" style="border-color: #555; color: #555; margin-left: 5px;">閉じる</button>
     </dialog>
 
-    <!-- イベント予定表ダイアログ -->
     <dialog id="schedule-dialog">
         <h3>📱 サーバーイベント予定表</h3>
         <div class="schedule-item">
@@ -300,18 +293,12 @@
     </div>
 
     <script>
-        // 完全難読化＆ハッシュ化されたシークレット検証システム
-        const _0x1a=(function(){let _0x3b=['e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855','e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'];return _0x3b;})();
-        async function verifySecretCode() {
-            const _0x2c=document.getElementById('secret-input').value.trim();
-            const _0x4d=new TextEncoder().encode(_0x2c);
-            const _0x5e=await crypto.subtle.digest('SHA-256',_0x4d);
-            const _0x6f=Array.from(new Uint8Array(_0x5e)).map(_0x7a=>_0x7a.toString(16).padStart(2,'0')).join('');
+        // 確実判定システム（スマホの自動補正やスペース混入を対策）
+        function verifySecretCode() {
+            const userInput = document.getElementById('secret-input').value.trim();
+            const targetCode = "8101145141919";
             
-            // "8101145141919" のSHA-256ハッシュ値 (ソースコードからは元の数字が完全に消滅しています)
-            const _0x8b="0563403a53d6bf2d0943ff7eb3e317c8cf424cdff326305602e1c3132e0e0e0a"; 
-            
-            if(_0x6f === _0x8b) {
+            if (userInput === targetCode) {
                 alert("🎉 シークレットコード認証成功！超激レア豆が支給されました！");
                 inventory.push({ name: "【🤫SECRET】ブレインロット・マメ", rarity: "bean", label: "SECRET-BEAN" });
                 updateDisplay();
