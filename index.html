@@ -3,31 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SORAMAME OF BRAINROT -オート召喚の間-</title>
+    <title>SORAMAME OF BRAINROT -ULTIMATE COMPLETE-</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #000;
-            color: #fff;
-            font-family: 'Courier New', Courier, monospace;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        body { 
+            margin: 0; 
+            background-color: #000; 
+            color: #fff; 
+            font-family: 'Courier New', Courier, monospace; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
             justify-content: center;
+            min-height: 100vh; 
+            padding: 20px;
+            overflow-x: hidden;
         }
 
-        h1 {
-            position: absolute;
-            top: 20px;
-            font-size: 2.5rem;
-            text-transform: uppercase;
-            color: #39ff14;
-            text-shadow: 0 0 10px #39ff14, 0 0 20px #39ff14;
-            animation: flicker 0.15s infinite alternate;
-            margin: 0;
+        h1 { 
+            color: #39ff14; 
+            text-shadow: 0 0 10px #39ff14, 0 0 20px #39ff14; 
+            animation: flicker 0.15s infinite alternate; 
+            margin-bottom: 5px;
+            font-size: 2.2rem;
+            text-align: center;
         }
 
         @keyframes flicker {
@@ -35,34 +33,38 @@
             100% { opacity: 1; }
         }
 
-        /* タイマー表示エリア */
-        #timer-display {
-            position: absolute;
-            top: 80px;
-            font-size: 1.2rem;
-            color: #00ffff;
-            text-shadow: 0 0 5px #00ffff;
-        }
-
-        /* キャラクターが表示されるメインステージ */
-        #stage {
-            position: relative;
-            width: 80vw;
-            height: 50vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border: 2px dashed #ff0055;
-            box-shadow: inset 0 0 20px rgba(255, 0, 85, 0.3);
-            background-color: rgba(0, 0, 0, 0.8);
-        }
-
-        /* 出現するキャラクターのスタイル */
-        .character-card {
+        .box { 
+            border: 2px dashed #ff0055; 
+            padding: 20px; 
+            margin: 10px 0; 
+            background: rgba(0,0,0,0.85); 
+            width: 90%; 
+            max-width: 650px; 
             text-align: center;
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            padding: 20px;
+            box-shadow: inset 0 0 15px rgba(255, 0, 85, 0.2);
+        }
+
+        button { 
+            background: #111; 
+            border: 2px solid #39ff14; 
+            color: #39ff14; 
+            padding: 10px 20px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-family: 'Courier New', Courier, monospace;
+            transition: all 0.1s ease;
+        }
+
+        button:hover { 
+            background: #39ff14; 
+            color: #000; 
+            box-shadow: 0 0 10px #39ff14;
+        }
+
+        /* キャラクターポップアップアニメーション */
+        .character-card {
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            padding: 10px;
         }
 
         @keyframes popIn {
@@ -70,117 +72,258 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        .char-name {
-            font-weight: bold;
-            margin-bottom: 10px;
+        /* レア度ごとのネオン装飾 */
+        .rare-common { color: #ffffff; font-size: 1.8rem; }
+        .rare-rare { color: #00ffff; font-size: 2rem; text-shadow: 0 0 8px #00ffff; }
+        .rare-got { color: #39ff14; font-size: 2.2rem; text-shadow: 0 0 10px #39ff14; }
+        .rare-secret { color: #ff00ff; font-size: 2.5rem; text-shadow: 0 0 15px #ff00ff, 0 0 25px #ff00ff; font-style: italic; }
+        .rare-bean { color: #ffaa00; font-size: 2.8rem; text-shadow: 0 0 20px #ff0000, 0 0 30px #ffaa00; font-weight: 900; }
+        
+        #inventory { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            gap: 6px;
+            margin-top: 10px; 
+            max-height: 150px;
+            overflow-y: auto;
         }
 
-        .char-rarity {
+        .inv-item { 
+            background: #1a1a1a; 
+            border: 1px solid #555; 
+            padding: 6px 10px; 
+            font-size: 0.85rem; 
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .inv-item button {
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            border-color: #ff0055;
+            color: #ff0055;
+        }
+
+        .inv-item button:hover {
+            background: #ff0055;
+            color: #000;
+            box-shadow: 0 0 5px #ff0055;
+        }
+
+        #event-msg { 
+            color: #00ffff; 
+            font-weight: bold; 
+            height: 24px; 
+            margin-bottom: 5px; 
+            text-shadow: 0 0 5px #00ffff;
+            font-size: 1.1rem;
+        }
+
+        #timer {
+            color: #ffaa00;
             font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        /* レア度ごとの見た目 */
-        .rare-common { color: #ffffff; font-size: 2rem; }
-        .rare-rare { color: #00ffff; font-size: 2.5rem; text-shadow: 0 0 10px #00ffff; }
-        .rare-got { color: #39ff14; font-size: 3rem; text-shadow: 0 0 15px #39ff14; }
-        .rare-secret { 
-            color: #ff00ff; 
-            font-size: 3.2rem; 
-            text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff; 
-            font-style: italic;
-        }
-        .rare-bean { 
-            color: #ffaa00; 
-            font-size: 4rem; 
-            text-shadow: 0 0 20px #ff0000, 0 0 40px #ffaa00, 0 0 60px #ffff00;
-            font-weight: 900;
-            animation: specialFlicker 0.5s infinite alternate;
-        }
-
-        @keyframes specialFlicker {
-            0% { opacity: 0.7; transform: scale(0.98); }
-            100% { opacity: 1; transform: scale(1.02); }
-        }
-
-        /* フッターの統計情報 */
-        #stats {
-            position: absolute;
-            bottom: 20px;
-            font-size: 0.9rem;
-            color: #888;
+            margin-top: 8px;
         }
     </style>
 </head>
 <body>
 
     <h1>SORAMAME OF BRAINROT</h1>
-    <div id="timer-display">NEXT SWITCH: <span id="countdown">10</span>s</div>
-
-    <div id="stage">
-        <!-- 自動でキャラがここに入れ替わる -->
-        <div class="character-card">
-            <div class="char-name">読み込み中...</div>
+    <div id="event-msg">SYSTEM: 待機中...</div>
+    
+    <div class="box">
+        <div id="stage">
+            <div id="current-char" class="character-card rare-common">召喚を待っています...</div>
         </div>
+        <button onclick="takeCharacter()" style="margin-top: 15px;">[ インベントリに取る ]</button>
+        <div id="timer">NEXT SUMMON: 10s</div>
     </div>
 
-    <div id="stats">TOTAL SPINS: <span id="spin-count">0</span></div>
+    <div class="box">
+        <h3>インベントリ (<span id="inv-count">0</span>/<span id="inv-max">10</span>)</h3>
+        <div id="inventory"></div>
+    </div>
+
+    <div class="box">
+        <h3>リバースシステム (Lv.<span id="rev-lv">0</span> / Max 5)</h3>
+        <button onclick="attemptReverse()">[ リバース実行 (素材消費) ]</button>
+    </div>
 
     <script>
-        // キャラクターデータ（ジャック・ソラマメを配置）
-        const characters = [
-            { name: "普通のソラマメ", rarity: "common", label: "Common", chance: 80.0 },
-            { name: "溶けかけの豆", rarity: "rare", label: "Rare", chance: 15.0 },
-            { name: "ビーン・マシーン", rarity: "got", label: "Got", chance: 4.985 },
-            { name: "【シークレット】Beans Soramame", rarity: "secret", label: "Secret", chance: 0.01 },
-            { name: "【BEAN】ジャック・ソラマメ", rarity: "bean", label: "BEAN", chance: 0.0005 }
+        let inventory = [];
+        let invMax = 10;
+        let revLv = 0;
+        let currentChar = null;
+        let timeLeft = 10;
+        let lastEventKey = "";
+        
+        // キャラクター全定義データ
+        const chars = [
+            { name: "普通のソラマメ", chance: 50.0, rarity: "common", label: "Common" },
+            { name: "溶けかけの豆", chance: 20.0, rarity: "rare", label: "Rare" },
+            { name: "加熱えだまめ", chance: 15.0, rarity: "rare", label: "Rare" },
+            { name: "ビーン・マシン", chance: 10.0, rarity: "got", label: "Got" },
+            { name: "エダマメ・マシン", chance: 4.495, rarity: "got", label: "Got" },
+            { name: "Beans soramame", chance: 0.5, rarity: "secret", label: "Secret" },
+            { name: "ツブヨンコ・エダまめ", chance: 0.0045, rarity: "secret", label: "Secret" },
+            { name: "【BEAN】ジャック・ソラマメ", chance: 0.0005, rarity: "bean", label: "BEAN" }
         ];
 
-        let totalSpins = 0;
-        let timeLeft = 10;
-
-        const stage = document.getElementById('stage');
-        const countdownElem = document.getElementById('countdown');
-        const spinCountElem = document.getElementById('spin-count');
-
-        function rollAndDisplay() {
-            totalSpins++;
-            spinCountElem.innerText = totalSpins;
-
-            const pickedChar = drawGacha();
-
-            stage.innerHTML = `
-                <div class="character-card">
-                    <div class="char-name rare-${pickedChar.rarity}">${pickedChar.name}</div>
-                    <div class="char-rarity rare-${pickedChar.rarity}">[ RARITY: ${pickedChar.label} ]</div>
-                </div>
-            `;
+        function drawNormal() {
+            let r = Math.random() * 100;
+            let sum = 0;
+            for(let c of chars) {
+                sum += c.chance;
+                if(r <= sum) return { ...c };
+            }
+            return { ...chars[0] };
         }
 
-        function drawGacha() {
-            const randomNum = Math.random() * 100;
-            let cumulativeChance = 0;
-            for (const char of characters) {
-                cumulativeChance += char.chance;
-                if (randomNum <= cumulativeChance) {
-                    return char;
+        function runGameLoop() {
+            const now = new Date();
+            const h = now.getHours();
+            const m = now.getMinutes();
+            let eventKey = h + "-" + m;
+            let display = null;
+            let msg = "SYSTEM: 通常稼働中";
+
+            // 1. シークレット確定イベント (18:00)
+            if (h === 18 && m === 0 && lastEventKey !== eventKey) {
+                display = { ...chars.find(c => c.name === "Beans soramame") };
+                msg = "⚡ 【緊急】シークレット確定イベント発動！！";
+                lastEventKey = eventKey;
+            } 
+            // 2. ビーンチャンスイベント (20:00)
+            else if (h === 20 && m === 0 && lastEventKey !== eventKey) {
+                const isBeanHit = Math.random() < 0.015; // 1.5%
+                display = isBeanHit ? { ...chars.find(c => c.name.includes("ジャック")) } : drawNormal();
+                msg = "🔥 【熱狂】ビーンチャンス！1.5%でジャック降臨！";
+                lastEventKey = eventKey;
+            } 
+            else {
+                display = drawNormal();
+                // 3. マメ変異イベント (18:30〜19:00)
+                if ((h === 18 && m >= 30) || (h === 19 && m < 30)) {
+                    if(Math.random() < 0.1) {
+                        display.name = "🫛" + display.name;
+                    }
+                    msg = "🫛 【異常】マメ変異発生中 (変異確率10%)";
                 }
             }
-            return characters[0];
+
+            currentChar = display;
+            document.getElementById('event-msg').innerText = msg;
+            renderStage();
         }
 
+        function renderStage() {
+            const stage = document.getElementById('current-char');
+            if (!currentChar) {
+                stage.innerText = "召喚を待っています...";
+                stage.className = "character-card rare-common";
+                return;
+            }
+
+            stage.innerHTML = `
+                <div>${currentChar.name}</div>
+                <div style="font-size: 0.8rem; margin-top: 5px; opacity: 0.7;">[ RARITY: ${currentChar.label} ]</div>
+            `;
+            stage.className = "character-card rare-" + currentChar.rarity;
+        }
+
+        function updateDisplay() {
+            document.getElementById('inv-max').innerText = invMax;
+            document.getElementById('inv-count').innerText = inventory.length;
+            document.getElementById('rev-lv').innerText = revLv;
+            
+            const invDiv = document.getElementById('inventory');
+            if (inventory.length === 0) {
+                invDiv.innerHTML = '<span style="color: #666; font-size: 0.8rem;">インベントリは空です</span>';
+                return;
+            }
+
+            invDiv.innerHTML = inventory.map((item, i) => `
+                <div class="inv-item">
+                    <span class="rare-${item.rarity}" style="font-size:0.8rem;">${item.name}</span>
+                    <button onclick="deleteItem(${i})">X</button>
+                </div>
+            `).join('');
+        }
+
+        function takeCharacter() {
+            if (!currentChar) return;
+            if (inventory.length >= invMax) {
+                alert("⚠ エラー: インベントリが満タンです！（上限 " + invMax + " 個）\n不要なキャラを削除するかリバースしてください。");
+                return;
+            }
+            inventory.push({ ...currentChar });
+            updateDisplay();
+        }
+
+        function deleteItem(idx) {
+            inventory.splice(idx, 1);
+            updateDisplay();
+        }
+
+        function attemptReverse() {
+            const reqs = [
+                ["溶けかけの豆", "加熱えだまめ"],
+                ["加熱えだまめ", "ビーン・マシン"],
+                ["エダマメ・マシン"],
+                ["Beans soramame"],
+                ["ツブヨンコ・エダまめ"]
+            ];
+
+            if (revLv >= 5) {
+                alert("✨ リバースは既に限界（Lv.5）に達しています！");
+                return;
+            }
+
+            let needed = reqs[revLv];
+            let canReverse = true;
+
+            // 素材チェック（名前に部分一致するものを含むか）
+            for (let reqName of needed) {
+                const foundIndex = inventory.findIndex(i => i.name.includes(reqName));
+                if (foundIndex === -1) {
+                    canReverse = false;
+                    break;
+                }
+            }
+
+            if (canReverse) {
+                // 素材を消費
+                needed.forEach(reqName => {
+                    const foundIndex = inventory.findIndex(i => i.name.includes(reqName));
+                    if (foundIndex !== -1) {
+                        inventory.splice(foundIndex, 1);
+                    }
+                });
+
+                revLv++;
+                invMax += 2;
+                alert("🎉 リバース成功！空間が歪み、インベントリ上限が +2 されました！（現在上限: " + invMax + "）");
+                updateDisplay();
+            } else {
+                alert("❌ 素材が足りません！\nリバースLv." + (revLv + 1) + "に必要な素材を確認してください。");
+            }
+        }
+
+        // 10秒タイマーとループ
         setInterval(() => {
             timeLeft--;
             if (timeLeft <= 0) {
-                rollAndDevice = rollAndDisplay();
+                runGameLoop();
                 timeLeft = 10;
             }
-            countdownElem.innerText = timeLeft;
+            document.getElementById('timer').innerText = "NEXT SUMMON: " + timeLeft + "s";
         }, 1000);
 
-        // 初回実行
-        rollAndDisplay();
+        // 初期起動
+        runGameLoop();
+        updateDisplay();
     </script>
 </body>
 </html>
