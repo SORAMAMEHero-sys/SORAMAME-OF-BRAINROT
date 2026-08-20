@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SORAMAME OF BRAINROT -INSTANT UPDATE-</title>
+    <title>SORAMAME OF BRAINROT -LOUD SOUND UPDATE-</title>
     <style>
         body { 
             margin: 0; 
@@ -131,13 +131,11 @@
 
         .character-card {
             padding: 8px;
-            /* 戻る時のアニメーションを無くし、常に即時表示にするためアニメーション指定を削除 */
         }
 
         .rare-common { color: #ffffff; font-size: 1.6rem; }
         .rare-rare { color: #00ffff; font-size: 1.8rem; text-shadow: 0 0 8px #00ffff; }
         
-        /* Got: 虹色 */
         .rare-got { 
             font-size: 2rem; 
             font-weight: bold;
@@ -152,7 +150,6 @@
             100% { filter: hue-rotate(360deg); }
         }
 
-        /* Secret: 黒 */
         .rare-secret { 
             color: #111111; 
             font-size: 2.2rem; 
@@ -161,7 +158,6 @@
             font-style: italic; 
         }
 
-        /* BEAN: 紫 */
         .rare-bean { 
             color: #bf00ff; 
             font-size: 2.4rem; 
@@ -275,7 +271,6 @@
     <button id="secret-btn" onclick="openSecretModal()" title="シークレットコード入力">🤫</button>
     <button id="phone-btn" onclick="openScheduleModal()" title="イベント予定表">📱</button>
 
-    <!-- シークレットコード入力ダイアログ -->
     <dialog id="secret-dialog">
         <h3 style="color: #ff00ff; border-color: #ff00ff;">🤫 シークレットコード</h3>
         <p style="font-size: 0.85rem; color: #aaa;">隠されたコードを入力せよ……</p>
@@ -284,7 +279,6 @@
         <button onclick="closeSecretModal()" style="border-color: #555; color: #555; margin-left: 5px;">閉じる</button>
     </dialog>
 
-    <!-- 管理者パネルダイアログ -->
     <dialog id="admin-dialog">
         <h3 style="color: #39ff14; border-color: #39ff14;">⚙️ ADMIN PANEL (管理者)</h3>
         
@@ -330,7 +324,6 @@
         </div>
     </dialog>
 
-    <!-- イベント予定表ダイアログ -->
     <dialog id="schedule-dialog">
         <h3>📱 サーバーイベント予定表</h3>
         <div class="schedule-item">
@@ -379,7 +372,6 @@
         <div id="inventory"></div>
     </div>
 
-    <!-- クラフトマシンセクション -->
     <div class="box" style="border-color: #00ffff;">
         <h3 style="color: #00ffff;">🧪 クラフトマシン</h3>
         <div class="req-list">レシピ: ツブヨンコ・エダまめ ＋ ジャック・ソラマメ ＝ 👑ツブヨンコ・ソラマメ</div>
@@ -451,7 +443,7 @@
             }
         }
 
-        // --- サウンド生成エンジン (Web Audio API) ---
+        // --- サウンド生成エンジン (大音量＆迫力ブースト版) ---
         let audioCtx = null;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -460,17 +452,18 @@
             }
         }
 
+        // 1. Common / Rare (音量大幅アップ: 0.7)
         function playCommonSound(isRare = false) {
             initAudio();
             if(!audioCtx) return;
             let osc = audioCtx.createOscillator();
             let gain = audioCtx.createGain();
             osc.type = isRare ? "triangle" : "sine";
-            let startFreq = isRare ? 440 : 300;
-            let endFreq = isRare ? 880 : 150;
+            let startFreq = isRare ? 500 : 350;
+            let endFreq = isRare ? 950 : 180;
             osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + 0.15);
-            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -478,6 +471,7 @@
             osc.stop(audioCtx.currentTime + 0.15);
         }
 
+        // 2. Got (虹色) (音量大幅アップ: 0.6)
         function playGotSound() {
             initAudio();
             if(!audioCtx) return;
@@ -487,7 +481,7 @@
                 let gain = audioCtx.createGain();
                 osc.type = "sine";
                 osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.06);
-                gain.gain.setValueAtTime(0.12, audioCtx.currentTime + i * 0.06);
+                gain.gain.setValueAtTime(0.6, audioCtx.currentTime + i * 0.06);
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.06 + 0.25);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
@@ -496,16 +490,17 @@
             });
         }
 
+        // 3. Secret (黒) (音量大幅アップ: 0.7)
         function playSecretSound() {
             initAudio();
             if(!audioCtx) return;
-            const notes = [150, 130, 110, 90];
+            const notes = [180, 150, 120, 95];
             notes.forEach((freq, i) => {
                 let osc = audioCtx.createOscillator();
                 let gain = audioCtx.createGain();
                 osc.type = "sawtooth";
                 osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.08);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime + i * 0.08);
+                gain.gain.setValueAtTime(0.7, audioCtx.currentTime + i * 0.08);
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.08 + 0.3);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
@@ -514,20 +509,21 @@
             });
         }
 
+        // 4. BEAN / CRAFT (爆音＆超ド迫力: 0.9)
         function playBeanSound() {
             initAudio();
             if(!audioCtx) return;
             let osc = audioCtx.createOscillator();
             let gain = audioCtx.createGain();
             osc.type = "sawtooth";
-            osc.frequency.setValueAtTime(110, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(35, audioCtx.currentTime + 0.9);
-            gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.95);
+            osc.frequency.setValueAtTime(130, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 1.0);
+            gain.gain.setValueAtTime(0.9, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.0);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.start(audioCtx.currentTime);
-            osc.stop(audioCtx.currentTime + 0.95);
+            osc.stop(audioCtx.currentTime + 1.0);
         }
 
         const chars = [
@@ -624,7 +620,6 @@
             isAlreadyTaken = false;
             timeLeft = 10;
 
-            // --- レアリティに応じた出現サウンドの再生 ---
             if (currentChar.rarity === 'common') {
                 playCommonSound(false);
             } else if (currentChar.rarity === 'rare') {
@@ -649,7 +644,6 @@
 
             if (!currentChar) return;
 
-            // 瞬間移動（一瞬で切り替え）するため、HTMLを直接置き換える
             stage.innerHTML = `
                 <div>${currentChar.name}</div>
                 <div style="font-size: 0.8rem; margin-top: 4px; opacity: 0.7;">[ RARITY: ${currentChar.label} | 収益: +${currentChar.dps}G/s ]</div>
