@@ -2,894 +2,679 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SORAMAME OF BRAINROT -LOUD SOUND UPDATE-</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>モンスターズ・リベンジ</title>
     <style>
-        body { 
-            margin: 0; 
-            background-color: #000; 
-            color: #fff; 
-            font-family: 'Courier New', Courier, monospace; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center;
-            min-height: 100vh; 
-            padding: 20px;
-            overflow-x: hidden;
-        }
-
-        #secret-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: #111;
-            border: 2px solid #ff00ff;
-            color: #ff00ff;
-            font-size: 1.5rem;
-            padding: 8px 12px;
-            cursor: pointer;
-            z-index: 100;
-            box-shadow: 0 0 10px #ff00ff;
-            transition: all 0.2s;
-        }
-        #secret-btn:hover {
-            background: #ff00ff;
-            color: #000;
-        }
-
-        #phone-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #111;
-            border: 2px solid #00ffff;
-            color: #00ffff;
-            font-size: 1.5rem;
-            padding: 8px 12px;
-            cursor: pointer;
-            z-index: 100;
-            box-shadow: 0 0 10px #00ffff;
-            transition: all 0.2s;
-        }
-        #phone-btn:hover {
-            background: #00ffff;
-            color: #000;
-        }
-
-        h1 { 
-            color: #39ff14; 
-            text-shadow: 0 0 10px #39ff14, 0 0 20px #39ff14; 
-            animation: flicker 0.15s infinite alternate; 
-            margin-bottom: 2px;
-            font-size: 2.2rem;
-            text-align: center;
-        }
-
-        #economy-bar {
-            color: #ffaa00;
-            font-size: 1.1rem;
-            text-shadow: 0 0 8px #ffaa00;
-            margin-bottom: 10px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        @keyframes flicker {
-            0% { opacity: 0.8; }
-            100% { opacity: 1; }
-        }
-
-        .box { 
-            border: 2px dashed #ff0055; 
-            padding: 15px; 
-            margin: 8px 0; 
-            background: rgba(0,0,0,0.85); 
-            width: 90%; 
-            max-width: 650px; 
-            text-align: center;
-            box-shadow: inset 0 0 15px rgba(255, 0, 85, 0.2);
-        }
-
-        button { 
-            background: #111; 
-            border: 2px solid #39ff14; 
-            color: #39ff14; 
-            padding: 8px 16px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-family: 'Courier New', Courier, monospace;
-            transition: all 0.1s ease;
-        }
-
-        button:hover:not(:disabled) { 
-            background: #39ff14; 
-            color: #000; 
-            box-shadow: 0 0 10px #39ff14;
-        }
-
-        button:disabled {
-            border-color: #555;
-            color: #555;
-            cursor: not-allowed;
-            background: #111;
-        }
-
-        #timer-container {
-            width: 100%;
-            background: #222;
-            height: 8px;
-            margin-top: 10px;
-            border: 1px solid #444;
-            overflow: hidden;
-        }
-        #timer-bar {
-            width: 100%;
-            height: 100%;
-            background: #ffaa00;
-            transition: width 1s linear;
-        }
-
-        .character-card {
-            padding: 8px;
-        }
-
-        .rare-common { color: #ffffff; font-size: 1.6rem; }
-        .rare-rare { color: #00ffff; font-size: 1.8rem; text-shadow: 0 0 8px #00ffff; }
-        
-        .rare-got { 
-            font-size: 2rem; 
-            font-weight: bold;
-            background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: rainbowFlow 3s linear infinite;
-            filter: drop-shadow(0 0 8px rgba(255,255,255,0.5));
-        }
-        @keyframes rainbowFlow {
-            0% { filter: hue-rotate(0deg); }
-            100% { filter: hue-rotate(360deg); }
-        }
-
-        .rare-secret { 
-            color: #111111; 
-            font-size: 2.2rem; 
-            font-weight: 900;
-            text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff, 0 0 10px #000000;
-            font-style: italic; 
-        }
-
-        .rare-bean { 
-            color: #bf00ff; 
-            font-size: 2.4rem; 
-            text-shadow: 0 0 15px #bf00ff, 0 0 25px #6600cc; 
-            font-weight: 900; 
-        }
-
-        .rare-craft { 
-            color: #ff0055; 
-            font-size: 2.6rem; 
-            text-shadow: 0 0 25px #ff0055; 
-            font-weight: 900; 
-        }
-        
-        #inventory { 
-            display: flex; 
-            flex-wrap: wrap; 
-            justify-content: center; 
-            gap: 6px;
-            margin-top: 8px; 
-            max-height: 140px;
-            overflow-y: auto;
-        }
-
-        .inv-item { 
-            background: #1a1a1a; 
-            border: 1px solid #555; 
-            padding: 5px 8px; 
-            font-size: 0.8rem; 
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .inv-item button {
-            padding: 2px 5px;
-            font-size: 0.65rem;
-            border-color: #ff0055;
-            color: #ff0055;
-        }
-
-        .inv-item button:hover {
-            background: #ff0055;
-            color: #000;
-        }
-
-        #event-msg { 
-            color: #00ffff; 
-            font-weight: bold; 
-            height: 22px; 
-            margin-bottom: 4px; 
-            text-shadow: 0 0 5px #00ffff;
-            font-size: 1rem;
-            text-align: center;
-        }
-
-        dialog {
-            background: #111;
-            color: #00ffff;
-            border: 2px solid #00ffff;
-            padding: 20px;
-            max-width: 420px;
-            width: 85%;
-            font-family: 'Courier New', Courier, monospace;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-        }
-        dialog::backdrop {
-            background: rgba(0, 0, 0, 0.8);
-        }
-        dialog h3 {
-            margin-top: 0;
-            color: #39ff14;
-            text-align: center;
-            border-bottom: 1px dashed #39ff14;
-            padding-bottom: 8px;
-        }
-        .schedule-item {
-            margin: 10px 0;
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-        .schedule-time {
-            color: #ffaa00;
-            font-weight: bold;
-        }
-        input[type="text"], select {
-            background: #000;
-            border: 1px solid #ff00ff;
-            color: #ff00ff;
-            padding: 8px;
-            font-family: 'Courier New', Courier, monospace;
-            width: 90%;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        label {
-            font-size: 0.85rem;
-            color: #ff00ff;
-            display: block;
-            margin-top: 8px;
-        }
+        body { text-align: center; background-color: #1a1a1a; color: #ffffff; font-family: sans-serif; touch-action: manipulation; margin: 0; padding: 10px; }
+        h1 { color: #ffcc00; font-size: 22px; margin: 10px 0; }
+        canvas { border: 4px solid #fff; background: #333; width: 100%; max-width: 800px; height: 350px; display: block; margin: 0 auto; }
+        .screen { display: none; }
+        .screen.active { display: block; }
+        button { font-size: 16px; padding: 10px 18px; cursor: pointer; background-color: #ffcc00; border: none; border-radius: 8px; font-weight: bold; margin: 6px; }
+        .unit-btn { width: 70px; height: 75px; font-size: 13px; background-color: #333; color: white; border: 2px solid #555; border-radius: 8px; padding: 2px; line-height: 1.3; vertical-align: top; transition: 0.1s; }
+        .unit-btn.cd { border: 4px solid #ff0000 !important; color: #ff0000 !important; font-weight: bold; }
+        .stage-btn { font-size: 16px; padding: 12px 20px; margin: 8px; background-color: #ff5722; color: white; }
+        .up-btn { background-color: #4CAF50; color: white; padding: 6px 12px; font-size: 13px; }
+        .evolve-btn { background-color: #9c27b0; color: white; padding: 6px 12px; font-size: 13px; }
+        .panel { background: rgba(0,0,0,0.4); padding: 10px; border-radius: 10px; display: inline-block; margin: 5px; width: 95%; max-width: 500px; }
+        .inventory-panel { background: rgba(255, 255, 255, 0.08); padding: 8px; border-radius: 8px; display: inline-block; margin: 8px auto; width: 95%; max-width: 480px; text-align: left; font-size: 14px; }
     </style>
 </head>
 <body>
-
-    <button id="secret-btn" onclick="openSecretModal()" title="シークレットコード入力">🤫</button>
-    <button id="phone-btn" onclick="openScheduleModal()" title="イベント予定表">📱</button>
-
-    <dialog id="secret-dialog">
-        <h3 style="color: #ff00ff; border-color: #ff00ff;">🤫 シークレットコード</h3>
-        <p style="font-size: 0.85rem; color: #aaa;">隠されたコードを入力せよ……</p>
-        <input type="text" id="secret-input" placeholder="CODE INPUT..." autocomplete="off"><br>
-        <button onclick="verifySecretCode()" style="border-color: #ff00ff; color: #ff00ff;">[ 認証 ]</button>
-        <button onclick="closeSecretModal()" style="border-color: #555; color: #555; margin-left: 5px;">閉じる</button>
-    </dialog>
-
-    <dialog id="admin-dialog">
-        <h3 style="color: #39ff14; border-color: #39ff14;">⚙️ ADMIN PANEL (管理者)</h3>
-        
-        <label>🎯 次に出るキャラクターの強制指定:</label>
-        <select id="admin-target-char">
-            <option value="random">ランダム（通常抽選）</option>
-            <option value="普通のソラマメ">普通のソラマメ</option>
-            <option value="溶けかけの豆">溶けかけの豆</option>
-            <option value="加熱えだまめ">加熱えだまめ</option>
-            <option value="ビーン・マシン">ビーン・マシン</option>
-            <option value="エダマメ・マシン">エダマメ・マシン</option>
-            <option value="Beans soramame">Beans soramame</option>
-            <option value="ツブヨンコ・エダまめ">ツブヨンコ・エダまめ</option>
-            <option value="【BEAN】ジャック・ソラマメ">【BEAN】ジャック・ソラマメ</option>
-            <option value="👑【CRAFT】ツブヨンコ・ソラマメ">👑【CRAFT】ツブヨンコ・ソラマメ</option>
-        </select>
-
-        <label style="display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0;">
-            <input type="checkbox" id="admin-mutant-check" style="width: auto;"> 🫛 マメ変異を強制発生させる
-        </label>
-
-        <label style="display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0;">
-            <input type="checkbox" id="admin-rich-check" style="width: auto;"> 💰 所持コインを +1,000,000 にする
-        </label>
-
-        <label style="display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0; border-top: 1px dashed #ff0055; padding-top: 8px;">
-            <input type="checkbox" id="admin-reset-check" style="width: auto;"> ⚠️ セーブデータを完全初期化する（50万G）
-        </label>
-
-        <div style="text-align: center; margin-top: 15px;">
-            <button onclick="applyAdminSettings()" style="border-color: #39ff14; color: #39ff14;">[ 設定を適用 ]</button>
-            <button onclick="closeAdminModal()" style="border-color: #ff0055; color: #ff0055; margin-top: 8px;">閉じる</button>
-        </div>
-    </dialog>
-
-    <dialog id="schedule-dialog">
-        <h3>📱 サーバーイベント予定表</h3>
-        <div class="schedule-item">
-            <span class="schedule-time">⏰ 18:00 (1分間)</span><br>
-            ・**シークレット確定イベント**<br>
-            <span style="font-size: 0.8rem; color:#aaa;">必ず「Beans soramame」が出現！</span>
-        </div>
-        <div class="schedule-item">
-            <span class="schedule-time">⏰ 18:30 〜 19:00</span><br>
-            ・**マメ変異 ＆ 2倍サーバーラック**<br>
-            <span style="font-size: 0.8rem; color:#aaa;">変異確率10% ＋ ラックで確率2倍ブースト！</span>
-        </div>
-        <div class="schedule-item">
-            <span class="schedule-time">⏰ 20:00 (1分間)</span><br>
-            ・**ビーンチャンス**<br>
-            <span style="font-size: 0.8rem; color:#aaa;">1.5%の確率でジャック・ソラマメ降臨！</span>
-        </div>
-        <div class="schedule-item">
-            <span class="schedule-time">⏰ 21:00 〜 21:03</span><br>
-            ・**10倍サーバーラック起動**<br>
-            <span style="font-size: 0.8rem; color:#aaa;">最高峰の10倍確率ブースト発動！</span>
-        </div>
-        <div style="text-align: center; margin-top: 20px;">
-            <button onclick="closeScheduleModal()" style="border-color: #ff0055; color: #ff0055;">閉じる</button>
-        </div>
-    </dialog>
-
-    <h1>SORAMAME OF BRAINROT</h1>
-    <div id="economy-bar">
-        💰 COIN: <span id="coin-display">500000</span> (⚡ <span id="dps-display">0</span>/s)<br>
-        💎 富豪メダル: <span id="rich-medal-count" style="color: #ffeb3b;">0</span>こ | 
-        👑 国家予算メダル: <span id="national-medal-count" style="color: #ff4081;">0</span>こ
-    </div>
-    <div id="event-msg">SYSTEM: 待機中...</div>
+    <h1>モンスターズ・リベンジ</h1>
     
-    <div class="box">
-        <div id="stage">
-            <div id="current-char" class="character-card rare-common">召喚を待っています...</div>
+    <!-- マップ画面 -->
+    <div id="stageSelectScreen" class="screen active">
+        <div class="panel">
+            <h2>🗺️ マップ画面</h2>
+            <p style="font-size: 18px;">所持XP: <span id="totalXp" style="color: #ffcc00; font-weight: bold;">0</span> XP</p>
+            <button onclick="openPowerUpScreen()" style="background-color: #2196F3; color: white;">💪 パワーアップ画面</button>
         </div>
-        <button id="take-btn" onclick="takeCharacter()" style="margin-top: 12px;" disabled>[ 取得する (コスト: <span id="cost-display">0</span>G) ]</button>
         
-        <div id="timer-text" style="font-size: 0.8rem; margin-top: 6px; color: #ffaa00;">NEXT SUMMON: 10s</div>
-        <div id="timer-container">
-            <div id="timer-bar"></div>
-        </div>
-    </div>
-
-    <!-- 🎒 インベントリ -->
-    <div class="box">
-        <h3>インベントリ (<span id="inv-count">0</span>/<span id="inv-max">350</span>)</h3>
-        <div id="inventory"></div>
-    </div>
-
-    <!-- 🏛️ メダル博物館（ショップ） -->
-    <div class="box" style="border-color: #e91e63;">
-        <h3 style="color: #e91e63;">🏛️ メダル博物館</h3>
-        <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 8px;">クラフトに必要な高価なメダルを購入しよう</p>
-        <button onclick="buyRichMedal()" style="border-color: #e91e63; color: #e91e63; display: block; width: 100%; margin-bottom: 6px;">
-            富豪メダル購入 (500,000G)
-        </button>
-        <button onclick="buyNationalMedal()" style="border-color: #ff4081; color: #ff4081; display: block; width: 100%;">
-            国家予算メダル購入 (10,000,000G)
-        </button>
-    </div>
-
-    <!-- 🧪 クラフトマシン (30分切替 ＆ 画像デザイン形式) -->
-    <div class="box" style="border-color: #00ffff;">
-        <h3 style="color: #00ffff;">🧪 クラフトマシン (30分毎に切替)</h3>
-        
-        <div style="margin: 12px 0; background: #111; padding: 12px; border-radius: 6px; font-family: 'Courier New', Courier, monospace;">
-            <div id="craft-top-text" style="font-size: 0.95rem; color: #ffaa00; font-weight: bold;">素材読み込み中...</div>
-            <div style="font-size: 1.2rem; margin: 4px 0; color: #00ffff; letter-spacing: 4px;">⬇ ⬇ ⬇</div>
-            <div id="craft-result-text" class="rare-got" style="font-size: 1.2rem; font-weight: bold;">結果読み込み中...</div>
+        <!-- 素材インベントリ -->
+        <div class="inventory-panel">
+            <div style="font-weight: bold; color: #ffcc00; margin-bottom: 4px;">🎒 素材インベントリ</div>
+            <div>⚔️ 攻撃力の心得: <span id="inv-atk">0</span>個</div>
+            <div>🛡️ 体力の心得: <span id="inv-hp">0</span>個</div>
+            <div>🐦 速度の心得: <span id="inv-spd">0</span>個</div>
         </div>
 
-        <button onclick="attemptCraft()" style="border-color: #00ffff; color: #00ffff;">[ クラフト実行 ]</button>
+        <hr style="width: 80%; border-color: #444; margin: 15px auto;">
+        <h3>ステージを選んでね</h3>
+        <div id="stageButtonsContainer"></div>
+        <br>
+        <button onclick="unlockAllStages()" style="background-color: #607D8B; color: white; font-size: 11px; padding: 6px 10px;">【デバッグ】全ステージ解放</button>
+        <button onclick="resetSaveData()" style="background-color: #d9534f; color: white; font-size: 11px; padding: 6px 10px;">セーブ初期化</button>
+    </div>
+
+    <!-- パワーアップ画面 -->
+    <div id="powerUpScreen" class="screen">
+        <div class="panel">
+            <h2>⚡ パワーアップ (Lv1 ~ 10)</h2>
+            <p style="font-size: 18px;">所持XP: <span id="totalXpUp" style="color: #ffcc00; font-weight: bold;">0</span> XP</p>
+        </div>
+        <div id="powerUpList"></div>
+        <br>
+        <button onclick="closePowerUpScreen()" style="background-color: #666; color: white;">◀ マップに戻る</button>
+    </div>
+
+    <!-- バトル画面 -->
+    <div id="battleScreen" class="screen">
+        <h2 id="stageTitle" style="font-size: 18px; margin: 5px;">ステージ 1</h2>
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        <p style="font-size: 18px; font-weight: bold; margin: 8px 0;">所持金: <span id="money" style="color: #ffcc00;">0</span>円</p>
+        <div id="unitButtons"></div>
+        <br>
+        <button onclick="returnToMap()" style="background-color: #d9534f; color: white; font-size: 14px; padding: 8px 15px;">🚪 撤退してマップに戻る</button>
     </div>
 
     <script>
-        let inventory = [];
-        let invMax = 350;
-        let coins = 500000;
-        let richMedals = 0;
-        let nationalMedals = 0;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        let currentChar = null;
-        let timeLeft = 10;
-        let isAlreadyTaken = false;
-        let lastEventKey = "";
+        function playSound(type) {
+            if (!audioCtx) return;
+            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
 
-        let adminForceChar = "random";
-        let adminForceMutant = false;
-
-        function saveGame() {
-            const saveData = {
-                coins: coins,
-                inventory: inventory,
-                invMax: invMax,
-                richMedals: richMedals,
-                nationalMedals: nationalMedals,
-                currentChar: currentChar,
-                timeLeft: timeLeft,
-                isAlreadyTaken: isAlreadyTaken
-            };
-            localStorage.setItem('soramameGameData', JSON.stringify(saveData));
-        }
-
-        function loadGame() {
-            const saved = localStorage.getItem('soramameGameData');
-            if (saved) {
-                try {
-                    const data = JSON.parse(saved);
-                    coins = typeof data.coins === 'number' ? data.coins : 500000;
-                    inventory = Array.isArray(data.inventory) ? data.inventory : [];
-                    invMax = 350; // 常に350に固定
-                    richMedals = typeof data.richMedals === 'number' ? data.richMedals : 0;
-                    nationalMedals = typeof data.nationalMedals === 'number' ? data.nationalMedals : 0;
-                    
-                    if (data.currentChar) {
-                        currentChar = data.currentChar;
-                        timeLeft = typeof data.timeLeft === 'number' ? data.timeLeft : 10;
-                        isAlreadyTaken = typeof data.isAlreadyTaken === 'boolean' ? data.isAlreadyTaken : false;
-                    }
-                } catch(e) {
-                    console.error("セーブデータのロードに失敗しました", e);
-                }
+            if (type === "spawn") {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === "boss") {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.setValueAtTime(100, now + 0.15);
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === "defeat") {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.08);
+                gainNode.gain.setValueAtTime(0.15, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                osc.start(now);
+                osc.stop(now + 0.08);
             }
         }
 
-        function verifySecretCode() {
-            const userInput = document.getElementById('secret-input').value.trim();
-            const targetCode = "8101145141919";
-            
-            if (userInput === targetCode) {
-                closeSecretModal();
-                document.getElementById('admin-dialog').showModal();
-            } else {
-                alert("❌ コードが違います。");
-            }
+        // 背景画像の読み込み設定
+        const bgImages = {
+            "朝の森": new Image(),
+            "夕方の森": new Image(),
+            "夜の森": new Image(),
+            "ビーチ": new Image()
+        };
+        bgImages["朝の森"].src = "IMG_2435.jpeg";
+        bgImages["夕方の森"].src = "IMG_2436.jpeg";
+        bgImages["夜の森"].src = "IMG_2437.jpeg";
+        bgImages["ビーチ"].src = "IMG_2439.jpeg";
+
+        function getBgImageByStage(stage) {
+            if (stage <= 2) return bgImages["朝の森"];
+            if (stage <= 4) return bgImages["夕方の森"];
+            if (stage === 5) return bgImages["夜の森"];
+            return bgImages["ビーチ"];
         }
 
-        let audioCtx = null;
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+        const SAVE_KEY = "monsterGameSave_v1";
+        let saveData = JSON.parse(localStorage.getItem(SAVE_KEY)) || { 
+            maxUnlockedStage: 1, 
+            xp: 0, 
+            levels: [1, 1, 1, 1, 1, 1], 
+            unlockedUnits: [true, true, true, false, true, true],
+            evolved: [false, false, false, false, false, false],
+            materials: { atk: 0, hp: 0, spd: 0 }
+        };
+        
+        function checkSaveDataIntegrity() { 
+            if (!saveData.levels || saveData.levels.length < 6) saveData.levels = [1, 1, 1, 1, 1, 1]; 
+            if (!saveData.unlockedUnits || saveData.unlockedUnits.length < 6) saveData.unlockedUnits = [true, true, true, false, true, true]; 
+            if (!saveData.evolved) saveData.evolved = [false, false, false, false, false, false];
+            if (!saveData.materials) saveData.materials = { atk: 0, hp: 0, spd: 0 };
         }
+        checkSaveDataIntegrity();
+        
+        function saveGame() { localStorage.setItem(SAVE_KEY, JSON.stringify(saveData)); }
+        function unlockAllStages() { saveData.maxUnlockedStage = 7; saveData.unlockedUnits = [true, true, true, true, true, true]; saveGame(); initStageSelect(); }
+        function resetSaveData() { if (confirm("セーブデータを初期化しますか？")) { localStorage.removeItem(SAVE_KEY); saveData = { maxUnlockedStage: 1, xp: 0, levels: [1, 1, 1, 1, 1, 1], unlockedUnits: [true, true, true, false, true, true], evolved: [false, false, false, false, false, false], materials: { atk: 0, hp: 0, spd: 0 } }; initStageSelect(); } }
 
-        function playCommonSound(isRare = false) {
-            initAudio();
-            if(!audioCtx) return;
-            let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
-            osc.type = isRare ? "triangle" : "sine";
-            let startFreq = isRare ? 500 : 350;
-            let endFreq = isRare ? 950 : 180;
-            osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + 0.15);
-            gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start(audioCtx.currentTime);
-            osc.stop(audioCtx.currentTime + 0.15);
-        }
-
-        function playGotSound() {
-            initAudio();
-            if(!audioCtx) return;
-            const notes = [523.25, 659.25, 783.99, 987.77, 1046.50];
-            notes.forEach((freq, i) => {
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc.type = "sine";
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.06);
-                gain.gain.setValueAtTime(0.6, audioCtx.currentTime + i * 0.06);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.06 + 0.25);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(audioCtx.currentTime + i * 0.06);
-                osc.stop(audioCtx.currentTime + i * 0.06 + 0.25);
-            });
-        }
-
-        function playSecretSound() {
-            initAudio();
-            if(!audioCtx) return;
-            const notes = [180, 150, 120, 95];
-            notes.forEach((freq, i) => {
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc.type = "sawtooth";
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.08);
-                gain.gain.setValueAtTime(0.7, audioCtx.currentTime + i * 0.08);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.08 + 0.3);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(audioCtx.currentTime + i * 0.08);
-                osc.stop(audioCtx.currentTime + i * 0.08 + 0.3);
-            });
-        }
-
-        function playBeanSound() {
-            initAudio();
-            if(!audioCtx) return;
-            let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
-            osc.type = "sawtooth";
-            osc.frequency.setValueAtTime(130, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 1.0);
-            gain.gain.setValueAtTime(0.9, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.0);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start(audioCtx.currentTime);
-            osc.stop(audioCtx.currentTime + 1.0);
-        }
-
-        const chars = [
-            { name: "普通のソラマメ", chance: 50.0, rarity: "common", label: "Common", cost: 1000, dps: 1 },
-            { name: "溶けかけの豆", chance: 20.0, rarity: "rare", label: "Rare", cost: 5000, dps: 5 },
-            { name: "加熱えだまめ", chance: 15.0, rarity: "rare", label: "Rare", cost: 12000, dps: 12 },
-            { name: "ビーン・マシン", chance: 10.0, rarity: "got", label: "Got", cost: 30000, dps: 35 },
-            { name: "エダマメ・マシン", chance: 4.495, rarity: "got", label: "Got", cost: 80000, dps: 90 },
-            { name: "Beans soramame", chance: 0.5, rarity: "secret", label: "Secret", cost: 300000, dps: 400 },
-            { name: "ツブヨンコ・エダまめ", chance: 0.0045, rarity: "secret", label: "Secret", cost: 1500000, dps: 2500 },
-            { name: "【BEAN】ジャック・ソラマメ", chance: 0.0005, rarity: "bean", label: "BEAN", cost: 5000000, dps: 10000 },
-            { name: "👑【CRAFT】ツブヨンコ・ソラマメ", chance: 0, rarity: "craft", label: "CRAFT-GOD", cost: 0, dps: 50000 }
-        ];
-
-        const craftRecipes = [
-            {
-                type: "char_medal",
-                charName: "エダマメ・マシン",
-                medalType: "national",
-                medalCount: 3,
-                result: { name: "VIPエダマメ・マシン", rarity: "got", dps: 500, label: "VIP", cost: 0 },
-                descTop: "エダマメ・マシン ＆ 国家予算メダル 3こ",
-                descResult: "VIPエダマメ・マシン"
+        const monsters = [
+            { 
+                name: "スライム", evolveName: "スクイーズ", icon: "🟢", evolveIcon: "🔵", cost: 50, cd: 1.5, baseHp: 80, speed: 2.0, range: 40, baseAtk: 8, area: false, skill: null,
+                hasEvolve: true, evolveCostXp: 10000, evolveReq: { hp: 5 }
             },
-            {
-                type: "char_char",
-                char1: "ツブヨンコ・エダまめ",
-                char2: "【BEAN】ジャック・ソラマメ",
-                result: { name: "👑【CRAFT】ツブヨンコ・ソラマメ", rarity: "craft", dps: 50000, label: "CRAFT-GOD", cost: 0 },
-                descTop: "ツブヨンコ・エダまめ ＆ ジャック・ソラマメ",
-                descResult: "👑【CRAFT】ツブヨンコ・ソラマメ"
+            { 
+                name: "ゾンビ", evolveName: "ボス・ゾンビ", icon: "🧟", evolveIcon: "🧟‍♂️", cost: 120, cd: 3.0, baseHp: 350, speed: 0.8, range: 40, baseAtk: 12, area: false, skill: null,
+                hasEvolve: true, evolveCostXp: 10000, evolveReq: { spd: 2, hp: 3 }
+            },
+            { 
+                name: "ボマー", evolveName: "ヌクレアスボマー", icon: "💣", evolveIcon: "💥", cost: 200, cd: 6.0, baseHp: 40, speed: 3.0, range: 60, baseAtk: 150, area: true, skill: null,
+                hasEvolve: true, evolveCostXp: 10000, evolveReq: { atk: 10 }
+            },
+            { 
+                name: "タンクムーン", evolveName: "シャールサン", icon: "🌝", evolveIcon: "🌕", cost: 300, cd: 4.0, baseHp: 700, speed: 0.4, range: 40, baseAtk: 1, area: false, skill: { name: "高速敵ダメージ軽減", desc: "移動速度2.0以上の敵からのダメージを40%軽減" },
+                hasEvolve: true, evolveCostXp: 100000, evolveReq: { hp: 20 }
+            },
+            { 
+                name: "スズメバチ", evolveName: "オオスズメバチ", icon: "🐝", evolveIcon: "🐝", cost: 500, cd: 5.0, baseHp: 100, speed: 3.0, range: 150, baseAtk: 30, area: true, skill: { name: "飛び道具無効", desc: "弓使いなどの遠距離攻撃を完全に無効化する" },
+                hasEvolve: true, evolveCostXp: 100000, evolveReq: { spd: 20 }
+            },
+            { 
+                name: "ドラゴン", evolveName: "ヒドラゴラゴン", icon: "🐉", evolveIcon: "🐲", cost: 3000, cd: 25.0, baseHp: 500, speed: 1.2, range: 250, baseAtk: 50, area: true, skill: null,
+                hasEvolve: true, evolveCostXp: 350000, evolveReq: { hp: 20, atk: 20, spd: 20 }
             }
         ];
+        
+        const enemyTemplates = {
+            "戦士": { name: "戦士", icon: "⚔️", hp: 120, speed: 1.0, range: 40, atk: 10, isProjectile: false, drop: "atk", dropRate: 0.03, area: false },
+            "弓使い": { name: "弓使い", icon: "🏹", hp: 70, speed: 1.1, range: 200, atk: 8, isProjectile: true, drop: null, dropRate: 0, area: false },
+            "守護騎士": { name: "守護騎士", icon: "🛡️", hp: 400, speed: 0.4, range: 40, atk: 15, isProjectile: false, drop: "hp", dropRate: 0.03, area: false },
+            "ハト助": { name: "ハト助", icon: "🐦", hp: 500, speed: 2.0, range: 60, atk: 24, isProjectile: false, drop: "spd", dropRate: 0.03, area: false },
+            "フクロウ教授": { name: "フクロウ教授", icon: "🦉", hp: 3000, speed: 0.6, range: 40, atk: 30, isProjectile: false, isBoss: true, drop: null, dropRate: 0, area: false },
+            "メェーラム敵": { name: "メェーラム", icon: "🐑", hp: 999999, speed: 2.5, range: 50, atk: 999999, isProjectile: false, isBoss: true, drop: null, dropRate: 0, area: true }
+        };
 
-        function getCurrentRecipe() {
-            const now = new Date();
-            const totalMinutes = now.getHours() * 60 + now.getMinutes();
-            const recipeIndex = Math.floor(totalMinutes / 30) % craftRecipes.length;
-            return craftRecipes[recipeIndex];
-        }
-
-        function drawNormal(rackMultiplier = 1) {
-            let modifiedChars = chars.filter(c => c.chance > 0).map(c => {
-                let currentChance = c.chance;
-                if (c.rarity !== "common") {
-                    currentChance *= rackMultiplier;
-                }
-                return { ...c, chance: currentChance };
-            });
-
-            let totalChance = modifiedChars.reduce((sum, c) => sum + c.chance, 0);
-            let r = Math.random() * totalChance;
-            let sum = 0;
-
-            for(let c of modifiedChars) {
-                sum += c.chance;
-                if(r <= sum) return { ...c };
-            }
-            return { ...chars[0] };
-        }
-
-        function runGameLoop() {
-            const now = new Date();
-            const h = now.getHours();
-            const m = now.getMinutes();
-            let eventKey = h + "-" + m;
-            let display = null;
-            let msg = "SYSTEM: 通常稼働中";
-            let rackMultiplier = 1;
-
-            if (adminForceChar !== "random") {
-                let found = chars.find(c => c.name === adminForceChar);
-                if (found) {
-                    display = { ...found };
-                    if (adminForceMutant && !display.name.startsWith("🫛")) {
-                        display.name = "🫛" + display.name;
-                    }
-                    msg = "⚙️ 【管理者権限】キャラ強制指定 ＆ 変異設定適用中！";
-                }
-                adminForceChar = "random";
-            } else {
-                if (h === 21 && m >= 0 && m <= 3) {
-                    rackMultiplier = 10;
-                    msg = "🖥️ 【10倍サーバーラック起動中！！】高レア確率10倍暴走中！";
-                } 
-                else if ((h === 18 && m >= 30) || (h === 19 && m < 30)) {
-                    rackMultiplier = 2;
-                }
-
-                if (h === 18 && m === 0 && lastEventKey !== eventKey) {
-                    display = { ...chars.find(c => c.name === "Beans soramame") };
-                    msg = "⚡ 【緊急】シークレット確定イベント発動！！";
-                    lastEventKey = eventKey;
-                } 
-                else if (h === 20 && m === 0 && lastEventKey !== eventKey) {
-                    const isBeanHit = Math.random() < 0.015;
-                    display = isBeanHit ? { ...chars.find(c => c.name.includes("ジャック")) } : drawNormal(1);
-                    msg = "🔥 【熱狂】ビーンチャンス！1.5%でジャック降臨！";
-                    lastEventKey = eventKey;
-                } 
-                else {
-                    display = drawNormal(rackMultiplier);
-                    if ((h === 18 && m >= 30) || (h === 19 && m < 30)) {
-                        if(Math.random() < 0.1) {
-                            display.name = "🫛" + display.name;
-                        }
-                        msg = "🫛 【異常】マメ変異発生中 ＋ 🖥️ 2倍ラック稼働中";
-                    }
-                }
-            }
-
-            currentChar = display;
-            isAlreadyTaken = false;
-            timeLeft = 10;
-
-            if (currentChar.rarity === 'common') {
-                playCommonSound(false);
-            } else if (currentChar.rarity === 'rare') {
-                playCommonSound(true);
-            } else if (currentChar.rarity === 'got') {
-                playGotSound();
-            } else if (currentChar.rarity === 'secret') {
-                playSecretSound();
-            } else if (currentChar.rarity === 'bean' || currentChar.rarity === 'craft') {
-                playBeanSound();
-            }
-            
-            document.getElementById('event-msg').innerText = msg;
-            renderStage();
-            updateDisplay();
-            saveGame();
-        }
-
-        function renderStage() {
-            const stage = document.getElementById('current-char');
-            const takeBtn = document.getElementById('take-btn');
-
-            if (!currentChar) return;
-
-            stage.innerHTML = `
-                <div>${currentChar.name}</div>
-                <div style="font-size: 0.8rem; margin-top: 4px; opacity: 0.7;">[ RARITY: ${currentChar.label} | 収益: +${currentChar.dps}G/s ]</div>
-            `;
-            stage.className = "character-card rare-" + currentChar.rarity;
-            
-            if (isAlreadyTaken) {
-                takeBtn.disabled = true;
-                takeBtn.innerText = "✔ 取得済み";
-            } else {
-                takeBtn.disabled = false;
-                takeBtn.innerHTML = `[ 取得する (コスト: <span id="cost-display">${currentChar.cost}</span>G) ]`;
-            }
-        }
-
-        function updateDisplay() {
-            document.getElementById('coin-display').innerText = Math.floor(coins);
-            document.getElementById('inv-max').innerText = invMax;
-            document.getElementById('inv-count').innerText = inventory.length;
-            document.getElementById('rich-medal-count').innerText = richMedals;
-            document.getElementById('national-medal-count').innerText = nationalMedals;
-            
-            let totalDps = inventory.reduce((sum, item) => sum + item.dps, 0);
-            document.getElementById('dps-display').innerText = totalDps;
-
-            const recipe = getCurrentRecipe();
-            document.getElementById('craft-top-text').innerText = recipe.descTop;
-            document.getElementById('craft-result-text').innerText = recipe.descResult;
-
-            const invDiv = document.getElementById('inventory');
-            if (inventory.length === 0) {
-                invDiv.innerHTML = '<span style="color: #666; font-size: 0.8rem;">インベントリは空です</span>';
-                return;
-            }
-
-            invDiv.innerHTML = inventory.map((item, i) => `
-                <div class="inv-item">
-                    <span class="rare-${item.rarity}" style="font-size:0.75rem;">${item.name} (+${item.dps}G)</span>
-                    <button onclick="deleteItem(${i})">X</button>
-                </div>
-            `).join('');
-        }
-
-        function takeCharacter() {
-            if (!currentChar || isAlreadyTaken) return;
-
-            if (coins < currentChar.cost) {
-                alert("⚠ コインが足りません！");
-                return;
-            }
-
-            if (inventory.length >= invMax) {
-                alert("⚠ エラー: インベントリが満タンです！（上限 " + invMax + " 個）");
-                return;
-            }
-
-            coins -= currentChar.cost;
-            inventory.push({ ...currentChar });
-            isAlreadyTaken = true;
-
-            const takeBtn = document.getElementById('take-btn');
-            takeBtn.disabled = true;
-            takeBtn.innerText = "✔ 取得済み";
-
-            updateDisplay();
-            saveGame();
-        }
-
-        function deleteItem(idx) {
-            inventory.splice(idx, 1);
-            updateDisplay();
-            saveGame();
-        }
-
-        function buyRichMedal() {
-            let cost = 500000;
-            if (coins >= cost) {
-                coins -= cost;
-                richMedals += 1;
-                alert("💎 富豪メダルを購入しました！");
-                updateDisplay();
-                saveGame();
-            } else {
-                alert("❌ ゴールドが足りません！（必要: 500,000G）");
-            }
-        }
-
-        function buyNationalMedal() {
-            let cost = 10000000;
-            if (coins >= cost) {
-                coins -= cost;
-                nationalMedals += 1;
-                alert("👑 国家予算メダルを購入しました！");
-                updateDisplay();
-                saveGame();
-            } else {
-                alert("❌ ゴールドが足りません！（必要: 10,000,000G）");
-            }
-        }
-
-        function attemptCraft() {
-            const recipe = getCurrentRecipe();
-
-            if (recipe.type === "char_medal") {
-                const charIndex = inventory.findIndex(i => i.name.includes(recipe.charName));
-                const hasEnoughMedal = (nationalMedals >= recipe.medalCount);
-
-                if (charIndex !== -1 && hasEnoughMedal) {
-                    if (inventory.length >= invMax) {
-                        alert("⚠ インベントリが満タンのため、クラフトできません！");
-                        return;
-                    }
-                    inventory.splice(charIndex, 1);
-                    nationalMedals -= recipe.medalCount;
-
-                    inventory.push({ ...recipe.result });
-                    playBeanSound();
-                    alert(`👑 クラフト大成功！！『${recipe.result.name}』が誕生しました！！`);
-                    updateDisplay();
-                    saveGame();
-                } else {
-                    alert(`❌ 素材が足りません！\nインベントリに「${recipe.charName}」と国家予算メダル${recipe.medalCount}こが必要です。`);
-                }
-            } 
-            else if (recipe.type === "char_char") {
-                const idx1 = inventory.findIndex(i => i.name.includes(recipe.char1));
-                const idx2 = inventory.findIndex(i => i.name.includes(recipe.char2));
-
-                if (idx1 !== -1 && idx2 !== -1) {
-                    if (inventory.length >= invMax) {
-                        alert("⚠ インベントリが満タンのため、クラフトできません！");
-                        return;
-                    }
-                    if (idx1 > idx2) {
-                        inventory.splice(idx1, 1);
-                        inventory.splice(idx2, 1);
-                    } else {
-                        inventory.splice(idx2, 1);
-                        inventory.splice(idx1, 1);
-                    }
-
-                    inventory.push({ ...recipe.result });
-                    playBeanSound();
-                    alert(`👑 クラフト大成功！！『${recipe.result.name}』が誕生しました！！`);
-                    updateDisplay();
-                    saveGame();
-                } else {
-                    alert(`❌ クラフト用のキャラクター素材が足りません！\n「${recipe.char1}」と「${recipe.char2}」が必要です。`);
-                }
-            }
-        }
-
-        function applyAdminSettings() {
-            if (document.getElementById('admin-reset-check').checked) {
-                if (confirm("⚠️ 本当にすべてのセーブデータを初期化しますか？")) {
-                    localStorage.removeItem('soramameGameData');
-                    coins = 500000;
-                    inventory = [];
-                    invMax = 350;
-                    richMedals = 0;
-                    nationalMedals = 0;
-                    currentChar = null;
-                    alert("🗑️ セーブデータを初期化しました。");
-                }
-            }
-
-            adminForceChar = document.getElementById('admin-target-char').value;
-            adminForceMutant = document.getElementById('admin-mutant-check').checked;
-
-            if (document.getElementById('admin-rich-check').checked) {
-                coins += 1000000;
-            }
-
-            document.getElementById('admin-dialog').close();
-            alert("⚙️ 管理者設定を適用しました！");
-            runGameLoop();
-        }
-
-        function openScheduleModal() {
-            document.getElementById('schedule-dialog').showModal();
-        }
-        function closeScheduleModal() {
-            document.getElementById('schedule-dialog').close();
-        }
-
-        function openSecretModal() {
-            document.getElementById('secret-dialog').showModal();
-        }
-        function closeSecretModal() {
-            document.getElementById('secret-dialog').close();
-            document.getElementById('secret-input').value = "";
-        }
-        function closeAdminModal() {
-            document.getElementById('admin-dialog').close();
-        }
-
-        loadGame();
-
-        if (!currentChar) {
-            runGameLoop();
-        } else {
-            renderStage();
-            updateDisplay();
-        }
+        let money = 150, playerCastleHP = 1000, maxPlayerCastleHP = 1000, enemyCastleHP = 1000, maxEnemyCastleHP = 1000;
+        let gameRunning = false, activeMonsters = [], activeHeroes = [], projectiles = [], effects = [], currentStage = 1, gameLoopId = null, gameTimer = 0, stageTimerInterval = null, coolDowns = [0, 0, 0, 0, 0, 0];
 
         setInterval(() => {
-            let dps = inventory.reduce((sum, item) => sum + item.dps, 0);
-            if (dps > 0) {
-                coins += dps;
-                updateDisplay();
-            }
+            if (!gameRunning) return;
+            monsters.forEach((m, i) => {
+                if (!saveData.unlockedUnits[i]) return;
+                let btn = document.getElementById("btn-" + i);
+                if (!btn) return;
+                let currentIcon = saveData.evolved[i] ? m.evolveIcon : m.icon;
+                if (coolDowns[i] > 0) { 
+                    coolDowns[i] = Math.max(0, coolDowns[i] - 0.1); 
+                    btn.classList.add("cd"); 
+                    btn.innerHTML = `<span style="font-size:18px;">${currentIcon}</span><br><span style="font-size:11px; font-weight:bold;">${Math.ceil(coolDowns[i])}秒</span>`; 
+                } else if (btn.classList.contains("cd")) { 
+                    btn.classList.remove("cd"); 
+                    updateUnitBtnDisplay(i, btn); 
+                }
+            });
+        }, 100);
 
-            timeLeft--;
-            const bar = document.getElementById('timer-bar');
-            if (timeLeft < 0) timeLeft = 0;
-            bar.style.width = (timeLeft * 10) + "%";
+        function updateUnitBtnDisplay(i, btn) { 
+            checkSaveDataIntegrity(); 
+            let m = monsters[i]; 
+            let lvl = saveData.levels[i] || 1; 
+            let currentIcon = saveData.evolved[i] ? m.evolveIcon : m.icon;
+            btn.innerHTML = `<span style="font-size:18px;">${currentIcon}</span><br><span style="font-size:10px;">${saveData.evolved[i] ? '進化済' : 'Lv'+lvl}</span><br><span style="font-size:9px; color:#ffcc00;">${m.cost}円</span>`; 
+        }
 
-            if (timeLeft <= 0) {
-                runGameLoop();
-            } else {
+        function initStageSelect() { 
+            document.getElementById("totalXp").innerText = saveData.xp; 
+            document.getElementById("inv-atk").innerText = saveData.materials.atk;
+            document.getElementById("inv-hp").innerText = saveData.materials.hp;
+            document.getElementById("inv-spd").innerText = saveData.materials.spd;
+
+            const container = document.getElementById("stageButtonsContainer"); 
+            container.innerHTML = ""; 
+            for(let i = 1; i <= 7; i++) { 
+                let b = document.createElement("button"); 
+                b.className = "stage-btn"; 
+                b.innerText = i <= saveData.maxUnlockedStage ? `ステージ ${i} (${i * 200}XP)` : `ステージ ${i} 🔒`; 
+                b.disabled = i > saveData.maxUnlockedStage; 
+                b.onclick = () => startBattle(i); 
+                container.appendChild(b); 
+            } 
+        }
+
+        function openPowerUpScreen() { 
+            checkSaveDataIntegrity(); 
+            document.getElementById("stageSelectScreen").classList.remove("active"); 
+            document.getElementById("powerUpScreen").classList.add("active"); 
+            document.getElementById("totalXpUp").innerText = saveData.xp; 
+            const list = document.getElementById("powerUpList"); 
+            list.innerHTML = ""; 
+            
+            monsters.forEach((m, i) => { 
+                let isUnlocked = saveData.unlockedUnits[i];
+                let lvl = saveData.levels[i] || 1; 
+                let isEvolved = saveData.evolved[i];
+                let div = document.createElement("div"); 
+                div.style.cssText = "background: rgba(255,255,255,0.05); padding: 10px; margin: 6px auto; max-width: 400px; border-radius: 8px; text-align: left;"; 
+                
+                let skillHtml = "";
+                if (m.skill) {
+                    skillHtml = `<div style="font-size: 12px; color: #ffcc00; margin-top: 4px;">✨スキル: ${m.skill.name} - ${m.skill.desc}</div>`;
+                }
+
+                let currentName = isEvolved ? m.evolveName : m.name;
+                let currentIcon = isEvolved ? m.evolveIcon : m.icon;
+
+                if (!isUnlocked) {
+                    div.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size:15px; font-weight: bold; color: #888;">🔒 ${m.icon} ${m.name} (未解放)</span>
+                            <button class="up-btn" style="background-color: #ff9800;" onclick="unlockUnit(${i})">解放(3000XP)</button>
+                        </div>
+                        ${skillHtml}
+                    `;
+                } else if (isEvolved) {
+                    div.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size:15px; font-weight: bold; color: #ff4081;">✨ ${currentIcon} ${currentName} (進化済みMAX)</span>
+                            <span style="font-size: 13px; color: #ffcc00; font-weight: bold;">MAX</span>
+                        </div>
+                        ${skillHtml}
+                    `;
+                } else {
+                    let cost = lvl * 100;
+                    let canEvolve = (lvl >= 10 && m.hasEvolve);
+                    
+                    let evolveText = "";
+                    if (lvl >= 10 && m.hasEvolve) {
+                        evolveText = `<span style="font-size: 11px; color: #00e676; margin-left: 6px;">第2形態あり</span>`;
+                    }
+
+                    let rightButtonHtml = "";
+                    if (canEvolve) {
+                        rightButtonHtml = `<button class="evolve-btn" onclick="evolveUnit(${i})">進化</button>`;
+                    } else {
+                        rightButtonHtml = `<button class="up-btn" onclick="upgradeUnit(${i})" ${lvl >= 10 ? "disabled style='background:#555;'" : ""}>${lvl >= 10 ? "MAX" : `強化(${cost}XP)`}</button>`;
+                    }
+
+                    div.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span style="font-size:15px; font-weight: bold;">${currentIcon} ${currentName} (Lv:${lvl}/10)</span>
+                                ${evolveText}
+                            </div>
+                            ${rightButtonHtml}
+                        </div>
+                        ${skillHtml}
+                    `;
+                }
+                list.appendChild(div); 
+            }); 
+        }
+
+        function unlockUnit(index) {
+            if (saveData.xp >= 3000) {
+                saveData.xp -= 3000;
+                saveData.unlockedUnits[index] = true;
                 saveGame();
+                openPowerUpScreen();
+            } else {
+                alert("XPが足りません！（3000XP必要です）");
             }
-            document.getElementById('timer-text').innerText = "NEXT SUMMON: " + timeLeft + "s";
-        }, 1000);
+        }
+
+        function closePowerUpScreen() { 
+            document.getElementById("powerUpScreen").classList.remove("active"); 
+            document.getElementById("stageSelectScreen").classList.add("active"); 
+            initStageSelect(); 
+        }
+
+        function upgradeUnit(index) { 
+            checkSaveDataIntegrity(); 
+            let lvl = saveData.levels[index]; 
+            let cost = lvl * 100; 
+            if (lvl < 10 && saveData.xp >= cost) { 
+                saveData.xp -= cost; 
+                saveData.levels[index]++; 
+                saveGame(); 
+                openPowerUpScreen(); 
+            } else if (lvl >= 10) {
+                alert("すでに最大レベルです！");
+            } else {
+                alert("XPが足りません！");
+            }
+        }
+
+        function evolveUnit(index) {
+            let m = monsters[index];
+            let req = m.evolveReq;
+            
+            if (saveData.xp < m.evolveCostXp) {
+                alert(`XPが足りません！（${m.evolveCostXp}XP必要です）`);
+                return;
+            }
+            if (req.hp && saveData.materials.hp < req.hp) {
+                alert(`体力の心得が足りません！（必要: ${req.hp}個）`);
+                return;
+            }
+            if (req.atk && saveData.materials.atk < req.atk) {
+                alert(`攻撃力の心得が足りません！（必要: ${req.atk}個）`);
+                return;
+            }
+            if (req.spd && saveData.materials.spd < req.spd) {
+                alert(`速度の心得が足りません！（必要: ${req.spd}個）`);
+                return;
+            }
+
+            saveData.xp -= m.evolveCostXp;
+            if (req.hp) saveData.materials.hp -= req.hp;
+            if (req.atk) saveData.materials.atk -= req.atk;
+            if (req.spd) saveData.materials.spd -= req.spd;
+
+            saveData.evolved[index] = true;
+            saveGame();
+            alert(`おめでとう！ ${m.name} が ${m.evolveName} に進化しました！🎉`);
+            openPowerUpScreen();
+        }
+
+        function initBattleUI() { 
+            checkSaveDataIntegrity(); 
+            const container = document.getElementById("unitButtons"); 
+            container.innerHTML = ""; 
+            monsters.forEach((m, i) => { 
+                if (!saveData.unlockedUnits[i]) return; 
+                let btn = document.createElement("button"); 
+                btn.id = "btn-" + i; 
+                btn.className = "unit-btn"; 
+                updateUnitBtnDisplay(i, btn); 
+                btn.onclick = () => spawnMonster(i); 
+                container.appendChild(btn); 
+            }); 
+        }
+
+        function spawnMonster(index) { 
+            if (!saveData.unlockedUnits[index]) return;
+            if (coolDowns[index] > 0) return; 
+            let m = monsters[index]; 
+            if (money >= m.cost) { 
+                money -= m.cost; 
+                coolDowns[index] = m.cd; 
+                document.getElementById("money").innerText = money; 
+                playSound("spawn"); 
+
+                let lvl = saveData.levels[index] || 1; 
+                let multiplier = 1 + (lvl - 1) * 0.15; 
+                let hp = m.baseHp * multiplier;
+                let atk = m.baseAtk * multiplier;
+                let speed = m.speed;
+
+                if (saveData.evolved[index]) {
+                    if (index === 0) { hp *= 3; } 
+                    else if (index === 1) { hp *= 2; speed *= 1.75; } 
+                    else if (index === 2) { atk *= 5; } 
+                    else if (index === 3) { hp *= 7.5; } 
+                    else if (index === 4) { speed *= 30; } 
+                    else if (index === 5) { hp *= 7.5; atk *= 7.5; speed *= 7.5; } 
+                }
+
+                activeMonsters.push({ ...m, hp: hp, maxHp: hp, atk: atk, speed: speed, x: 70, evolved: saveData.evolved[index] }); 
+            } 
+        }
+
+        function spawnEnemy(key) { 
+            let template = enemyTemplates[key]; 
+            if(template) {
+                activeHeroes.push({ ...template, x: 730, hp: template.hp, maxHp: template.hp });
+                if (template.isBoss) { playSound("boss"); }
+            } 
+        }
+
+        function handleStageWaves(sec) {
+            switch(currentStage) {
+                case 1:
+                case 2:
+                    if (sec % 5 === 0) spawnEnemy("戦士");
+                    if (currentStage === 2 && sec % 8 === 0) spawnEnemy("弓使い");
+                    break;
+                case 3:
+                case 4:
+                    if (sec % 5 === 0) spawnEnemy("守護騎士");
+                    if (currentStage === 4 && sec % 6 === 0) spawnEnemy("弓使い");
+                    break;
+                case 5:
+                    if (sec === 5) spawnEnemy("フクロウ教授");
+                    if (sec % 4 === 0) spawnEnemy("ハト助");
+                    break;
+                case 6:
+                    if (sec % 4 === 0) spawnEnemy("ハト助");
+                    if (sec % 5 === 0) spawnEnemy("守護騎士");
+                    if (sec % 7 === 0) spawnEnemy("弓使い");
+                    break;
+                case 7:
+                    if (sec % 4 === 0) spawnEnemy("戦士");
+                    if (sec % 6 === 0) spawnEnemy("弓使い");
+                    if (sec % 8 === 0) spawnEnemy("守護騎士");
+                    if (sec % 10 === 0) spawnEnemy("ハト助");
+                    if (sec === 20) spawnEnemy("フクロウ教授");
+                    
+                    if (sec >= 100 && sec % 3 === 0) {
+                        spawnEnemy("メェーラム敵");
+                    }
+                    break;
+            }
+        }
+
+        setInterval(() => { 
+            if (!gameRunning) return; 
+            if (money < 9999) { 
+                money += 20; 
+                document.getElementById("money").innerText = money; 
+            } 
+        }, 500);
+
+        function drawBackground(ctx, canvas) {
+            let img = getBgImageByStage(currentStage);
+            if (img && img.complete && img.naturalWidth !== 0) {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                // 背景の上に薄暗いフィルターをかけてキャラクターを見やすくする
+                ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else {
+                ctx.fillStyle = "#333";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        // キャラクターの後ろに白の丸背景（または文字の縁取り効果）を描画して見やすくする関数
+        function drawCharacter(ctx, icon, x, y) {
+            ctx.save();
+            // 見やすさ向上のための白い丸の背景ベース
+            ctx.beginPath();
+            ctx.arc(x + 12, y - 12, 22, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "#333";
+            ctx.stroke();
+
+            // 絵文字本体
+            ctx.font = "34px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(icon, x + 12, y - 11);
+            ctx.restore();
+        }
+
+        function updateGame() {
+            if (!gameRunning) return;
+            const canvas = document.getElementById("gameCanvas"); 
+            const ctx = canvas.getContext("2d"); 
+            ctx.clearRect(0, 0, 800, 400);
+
+            // 背景描画（フィルター付き）
+            drawBackground(ctx, canvas);
+
+            // 城の表示
+            ctx.font = "45px Arial"; 
+            ctx.textAlign = "left";
+            ctx.textBaseline = "alphabetic";
+            ctx.fillText("🏰", 15, 335); 
+            ctx.fillText("👑", 735, 335);
+
+            // 体力バー
+            const bw = 80, bh = 8; 
+            ctx.fillStyle = "#555"; ctx.fillRect(15, 260, bw, bh); 
+            ctx.fillStyle = "#2ecc71"; ctx.fillRect(15, 260, bw * Math.max(0, playerCastleHP / maxPlayerCastleHP), bh); 
+            ctx.fillStyle = "#555"; ctx.fillRect(715, 260, bw, bh); 
+            ctx.fillStyle = "#e74c3c"; ctx.fillRect(715, 260, bw * Math.max(0, enemyCastleHP / maxEnemyCastleHP), bh);
+
+            // 味方モンスター描画
+            activeMonsters.forEach((m) => {
+                let target = activeHeroes.find(h => Math.abs(h.x - m.x) < m.range);
+                let currentIcon = m.evolved ? m.evolveIcon : m.icon;
+                if (target) {
+                    if (m.name === "ボマー") { 
+                        effects.push({ x: m.x, y: 330, t: "💥", life: 15 }); 
+                        activeHeroes.forEach(h => { if (Math.abs(h.x - m.x) < 120) h.hp -= m.atk; }); 
+                        m.hp = 0; 
+                    } else if (Math.random() < 0.06) { 
+                        projectiles.push({ x: m.x, targetX: target.x, col: "#f1c40f", type: "unit" }); 
+                        target.hp -= m.atk; 
+                    }
+                } else if (m.x < 700) {
+                    m.x += m.speed; 
+                } else {
+                    enemyCastleHP -= 0.6;
+                }
+                drawCharacter(ctx, currentIcon, m.x, 335);
+            });
+
+            let initialEnemyCount = activeHeroes.length;
+
+            // 敵キャラクター描画
+            activeHeroes.forEach((h) => {
+                if (h.area) {
+                    let target = activeMonsters.find(m => Math.abs(m.x - h.x) < h.range);
+                    if (target) {
+                        effects.push({ x: h.x, y: 330, t: "💥", life: 15 });
+                        activeMonsters.forEach(m => {
+                            if (Math.abs(m.x - h.x) < 100) {
+                                m.hp -= h.atk;
+                            }
+                        });
+                    } else if (h.x > 70) {
+                        h.x -= h.speed;
+                    } else {
+                        playerCastleHP -= 5.0;
+                    }
+                } else {
+                    let target = activeMonsters.find(m => { 
+                        if (m.name === "ボマー") return false; 
+                        return Math.abs(m.x - h.x) < m.range; 
+                    });
+                    if (target) { 
+                        if (Math.random() < 0.06) { 
+                            if (h.isProjectile && target.name === "スズメバチ" && target.skill) {
+                                effects.push({ x: target.x, y: 330, t: "🛡️", life: 15 }); 
+                            } else if (target.name === "タンクムーン" && h.speed >= 2.0) {
+                                let reducedAtk = h.atk * 0.6; 
+                                projectiles.push({ x: h.x, targetX: target.x, col: "#e74c3c", type: "enemy" }); 
+                                target.hp -= reducedAtk;
+                                effects.push({ x: target.x, y: 330, t: "🛡️", life: 10 });
+                            } else {
+                                projectiles.push({ x: h.x, targetX: target.x, col: "#e74c3c", type: "enemy" }); 
+                                target.hp -= h.atk; 
+                            }
+                        } 
+                    } else if (h.x > 70) {
+                        h.x -= h.speed; 
+                    } else {
+                        playerCastleHP -= 0.6;
+                    }
+                }
+                drawCharacter(ctx, h.icon, h.x, 335);
+            });
+
+            activeHeroes.forEach(h => {
+                if (h.hp <= 0 && h.drop && h.dropRate) {
+                    if (Math.random() < h.dropRate) {
+                        saveData.materials[h.drop]++;
+                        saveGame();
+                        let dropName = h.drop === "atk" ? "攻撃力の心得" : h.drop === "hp" ? "体力の心得" : "速度の心得";
+                        effects.push({ x: h.x, y: 290, t: `✨${dropName}GET!`, life: 30 });
+                    }
+                }
+            });
+
+            activeMonsters = activeMonsters.filter(m => m.hp > 0);
+            activeHeroes = activeHeroes.filter(h => h.hp > 0);
+            
+            if (activeHeroes.length < initialEnemyCount) {
+                playSound("defeat"); 
+            }
+
+            projectiles.forEach(p => {
+                ctx.fillStyle = p.col;
+                ctx.fillRect(p.x, 305, 6, 6);
+                p.x += (p.targetX > p.x ? 5 : -5);
+            });
+            projectiles = projectiles.filter(p => Math.abs(p.x - p.targetX) > 10);
+
+            effects.forEach(e => {
+                ctx.font = "20px Arial";
+                ctx.fillText(e.t, e.x, e.y - 20);
+                e.life--;
+            });
+            effects = effects.filter(e => e.life > 0);
+
+            if (playerCastleHP <= 0) {
+                gameRunning = false;
+                alert("敗北しました...");
+                returnToMap();
+                return;
+            }
+            if (enemyCastleHP <= 0) {
+                gameRunning = false;
+                let reward = currentStage * 200;
+                saveData.xp += reward;
+                if (currentStage === saveData.maxUnlockedStage && saveData.maxUnlockedStage < 7) {
+                    saveData.maxUnlockedStage++;
+                }
+                saveGame();
+                alert(`ステージクリア！ ${reward}XPを手に入れた！`);
+                returnToMap();
+                return;
+            }
+
+            gameLoopId = requestAnimationFrame(updateGame);
+        }
+
+        function startBattle(stageNum) { 
+            currentStage = stageNum; 
+            document.getElementById("stageSelectScreen").classList.remove("active"); 
+            document.getElementById("battleScreen").classList.add("active"); 
+            document.getElementById("stageTitle", stageNum).innerText = `ステージ ${stageNum}`; 
+            money = 150; 
+            playerCastleHP = 1000; 
+            enemyCastleHP = (stageNum === 7) ? 8000 : 6000; 
+            maxEnemyCastleHP = enemyCastleHP; 
+            activeMonsters = []; 
+            activeHeroes = []; 
+            projectiles = []; 
+            effects = []; 
+            gameTimer = 0; 
+            coolDowns = [0, 0, 0, 0, 0, 0]; 
+            document.getElementById("money").innerText = money; 
+            initBattleUI(); 
+            gameRunning = true; 
+            if(stageTimerInterval) clearInterval(stageTimerInterval); 
+            stageTimerInterval = setInterval(() => { 
+                if(!gameRunning) return; 
+                gameTimer++; 
+                handleStageWaves(gameTimer); 
+            }, 1000); 
+            updateGame(); 
+        }
+
+        function returnToMap() { 
+            gameRunning = false; 
+            cancelAnimationFrame(gameLoopId); 
+            if(stageTimerInterval) clearInterval(stageTimerInterval); 
+            document.getElementById("battleScreen").classList.remove("active"); 
+            document.getElementById("stageSelectScreen").classList.add("active"); 
+            initStageSelect(); 
+        }
+
+        initStageSelect();
     </script>
 </body>
 </html>
