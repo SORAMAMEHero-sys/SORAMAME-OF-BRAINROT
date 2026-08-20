@@ -2,53 +2,185 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>SORAMAME OF BRAINROT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SORAMAME OF BRAINROT -オート召喚の間-</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: #0a0a0a;
-            color: #e0e0e0;
+            background-color: #000;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            height: 100vh;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
         }
-        .container {
-            text-align: center;
-            padding: 40px;
-            border: 2px solid #33ff33;
-            box-shadow: 0 0 20px #33ff3355;
-        }
+
         h1 {
-            font-size: 3rem;
-            color: #33ff33;
+            position: absolute;
+            top: 20px;
+            font-size: 2.5rem;
             text-transform: uppercase;
-            letter-spacing: 5px;
+            color: #39ff14;
+            text-shadow: 0 0 10px #39ff14, 0 0 20px #39ff14;
+            animation: flicker 0.15s infinite alternate;
             margin: 0;
-            text-shadow: 2px 2px #ff00ff;
         }
-        p {
+
+        @keyframes flicker {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        /* タイマー表示エリア */
+        #timer-display {
+            position: absolute;
+            top: 80px;
             font-size: 1.2rem;
-            margin-top: 20px;
-            color: #b0b0b0;
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
         }
-        .footer {
-            margin-top: 50px;
-            font-size: 0.8rem;
-            color: #555;
+
+        /* キャラクターが表示されるメインステージ */
+        #stage {
+            position: relative;
+            width: 80vw;
+            height: 50vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #ff0055;
+            box-shadow: inset 0 0 20px rgba(255, 0, 85, 0.3);
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        /* 出現するキャラクターのスタイル */
+        .character-card {
+            text-align: center;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            padding: 20px;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .char-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .char-rarity {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* レア度ごとの見た目 */
+        .rare-common { color: #ffffff; font-size: 2rem; }
+        .rare-rare { color: #00ffff; font-size: 2.5rem; text-shadow: 0 0 10px #00ffff; }
+        .rare-got { color: #39ff14; font-size: 3rem; text-shadow: 0 0 15px #39ff14; }
+        .rare-secret { 
+            color: #ff00ff; 
+            font-size: 3.2rem; 
+            text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff00ff; 
+            font-style: italic;
+        }
+        .rare-bean { 
+            color: #ffaa00; 
+            font-size: 4rem; 
+            text-shadow: 0 0 20px #ff0000, 0 0 40px #ffaa00, 0 0 60px #ffff00;
+            font-weight: 900;
+            animation: specialFlicker 0.5s infinite alternate;
+        }
+
+        @keyframes specialFlicker {
+            0% { opacity: 0.7; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1.02); }
+        }
+
+        /* フッターの統計情報 */
+        #stats {
+            position: absolute;
+            bottom: 20px;
+            font-size: 0.9rem;
+            color: #888;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>SORAMAME</h1>
-        <div style="font-size: 1.5rem; color: #ff00ff; margin: 10px 0;">OF</div>
-        <h1>BRAINROT</h1>
-        <p>デジタルな深淵へようこそ。</p>
+
+    <h1>SORAMAME OF BRAINROT</h1>
+    <div id="timer-display">NEXT SWITCH: <span id="countdown">10</span>s</div>
+
+    <div id="stage">
+        <!-- 自動でキャラがここに入れ替わる -->
+        <div class="character-card">
+            <div class="char-name">読み込み中...</div>
+        </div>
     </div>
-    <div class="footer">Project Started: 2026</div>
+
+    <div id="stats">TOTAL SPINS: <span id="spin-count">0</span></div>
+
+    <script>
+        // キャラクターデータ（ジャック・ソラマメを配置）
+        const characters = [
+            { name: "普通のソラマメ", rarity: "common", label: "Common", chance: 80.0 },
+            { name: "溶けかけの豆", rarity: "rare", label: "Rare", chance: 15.0 },
+            { name: "ビーン・マシーン", rarity: "got", label: "Got", chance: 4.985 },
+            { name: "【シークレット】Beans Soramame", rarity: "secret", label: "Secret", chance: 0.01 },
+            { name: "【BEAN】ジャック・ソラマメ", rarity: "bean", label: "BEAN", chance: 0.0005 }
+        ];
+
+        let totalSpins = 0;
+        let timeLeft = 10;
+
+        const stage = document.getElementById('stage');
+        const countdownElem = document.getElementById('countdown');
+        const spinCountElem = document.getElementById('spin-count');
+
+        function rollAndDisplay() {
+            totalSpins++;
+            spinCountElem.innerText = totalSpins;
+
+            const pickedChar = drawGacha();
+
+            stage.innerHTML = `
+                <div class="character-card">
+                    <div class="char-name rare-${pickedChar.rarity}">${pickedChar.name}</div>
+                    <div class="char-rarity rare-${pickedChar.rarity}">[ RARITY: ${pickedChar.label} ]</div>
+                </div>
+            `;
+        }
+
+        function drawGacha() {
+            const randomNum = Math.random() * 100;
+            let cumulativeChance = 0;
+            for (const char of characters) {
+                cumulativeChance += char.chance;
+                if (randomNum <= cumulativeChance) {
+                    return char;
+                }
+            }
+            return characters[0];
+        }
+
+        setInterval(() => {
+            timeLeft--;
+            if (timeLeft <= 0) {
+                rollAndDevice = rollAndDisplay();
+                timeLeft = 10;
+            }
+            countdownElem.innerText = timeLeft;
+        }, 1000);
+
+        // 初回実行
+        rollAndDisplay();
+    </script>
 </body>
 </html>
