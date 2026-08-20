@@ -55,10 +55,33 @@
             transition: all 0.1s ease;
         }
 
-        button:hover { 
+        button:hover:not(:disabled) { 
             background: #39ff14; 
             color: #000; 
             box-shadow: 0 0 10px #39ff14;
+        }
+
+        button:disabled {
+            border-color: #555;
+            color: #555;
+            cursor: not-allowed;
+            background: #111;
+        }
+
+        /* プログレスバー（タイマー用） */
+        #timer-container {
+            width: 100%;
+            background: #222;
+            height: 8px;
+            margin-top: 12px;
+            border: 1px solid #444;
+            overflow: hidden;
+        }
+        #timer-bar {
+            width: 100%;
+            height: 100%;
+            background: #ffaa00;
+            transition: width 1s linear;
         }
 
         /* キャラクターポップアップアニメーション */
@@ -121,10 +144,10 @@
             font-size: 1.1rem;
         }
 
-        #timer {
+        .req-list {
+            font-size: 0.85rem;
             color: #ffaa00;
-            font-size: 0.9rem;
-            margin-top: 8px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -137,8 +160,13 @@
         <div id="stage">
             <div id="current-char" class="character-card rare-common">召喚を待っています...</div>
         </div>
-        <button onclick="takeCharacter()" style="margin-top: 15px;">[ インベントリに取る ]</button>
-        <div id="timer">NEXT SUMMON: 10s</div>
+        <button id="take-btn" onclick="takeCharacter()" style="margin-top: 15px;" disabled>[ インベントリに取る ]</button>
+        
+        <!-- 10秒タイマーの可視化バー -->
+        <div id="timer-text" style="font-size: 0.85rem; margin-top: 8px; color: #ffaa00;">NEXT SUMMON: 10s</div>
+        <div id="timer-container">
+            <div id="timer-bar"></div>
+        </div>
     </div>
 
     <div class="box">
@@ -148,6 +176,7 @@
 
     <div class="box">
         <h3>リバースシステム (Lv.<span id="rev-lv">0</span> / Max 5)</h3>
+        <div class="req-list" id="req-display">次の素材: 読み込み中...</div>
         <button onclick="attemptReverse()">[ リバース実行 (素材消費) ]</button>
     </div>
 
@@ -157,9 +186,9 @@
         let revLv = 0;
         let currentChar = null;
         let timeLeft = 10;
+        let isAlreadyTaken = false; // 今回のキャラを既に取りましたか？
         let lastEventKey = "";
         
-        // キャラクター全定義データ
         const chars = [
             { name: "普通のソラマメ", chance: 50.0, rarity: "common", label: "Common" },
             { name: "溶けかけの豆", chance: 20.0, rarity: "rare", label: "Rare" },
@@ -169,6 +198,15 @@
             { name: "Beans soramame", chance: 0.5, rarity: "secret", label: "Secret" },
             { name: "ツブヨンコ・エダまめ", chance: 0.0045, rarity: "secret", label: "Secret" },
             { name: "【BEAN】ジャック・ソラマメ", chance: 0.0005, rarity: "bean", label: "BEAN" }
+        ];
+
+        // リバースに必要な素材リスト
+        const reqs = [
+            ["溶けかけの豆", "加熱えだまめ"],
+            ["加熱えだまめ", "ビーン・マシン"],
+            ["エダマメ・マシン"],
+            ["Beans soramame"],
+            ["ツブヨンコ・エダまめ"]
         ];
 
         function drawNormal() {
@@ -189,22 +227,19 @@
             let display = null;
             let msg = "SYSTEM: 通常稼働中";
 
-            // 1. シークレット確定イベント (18:00)
             if (h === 18 && m === 0 && lastEventKey !== eventKey) {
                 display = { ...chars.find(c => c.name === "Beans soramame") };
                 msg = "⚡ 【緊急】シークレット確定イベント発動！！";
                 lastEventKey = eventKey;
             } 
-            // 2. ビーンチャンスイベント (20:00)
             else if (h === 20 && m === 0 && lastEventKey !== eventKey) {
-                const isBeanHit = Math.random() < 0.015; // 1.5%
+                const isBeanHit = Math.random() < 0.015;
                 display = isBeanHit ? { ...chars.find(c => c.name.includes("ジャック")) } : drawNormal();
                 msg = "🔥 【熱狂】ビーンチャンス！1.5%でジャック降臨！";
                 lastEventKey = eventKey;
             } 
             else {
                 display = drawNormal();
-                // 3. マメ変異イベント (18:30〜19:00)
                 if ((h === 18 && m >= 30) || (h === 19 && m < 30)) {
                     if(Math.random() < 0.1) {
                         display.name = "🫛" + display.name;
@@ -214,23 +249,28 @@
             }
 
             currentChar = display;
+            isAlreadyTaken = false; // 新しいキャラが出たので「未取得」にリセット
+            
             document.getElementById('event-msg').innerText = msg;
             renderStage();
+            updateDisplay();
         }
 
         function renderStage() {
             const stage = document.getElementById('current-char');
-            if (!currentChar) {
-                stage.innerText = "召喚を待っています...";
-                stage.className = "character-card rare-common";
-                return;
-            }
+            const takeBtn = document.getElementById('take-btn');
+
+            if (!currentChar) return;
 
             stage.innerHTML = `
                 <div>${currentChar.name}</div>
                 <div style="font-size: 0.8rem; margin-top: 5px; opacity: 0.7;">[ RARITY: ${currentChar.label} ]</div>
             `;
             stage.className = "character-card rare-" + currentChar.rarity;
+            
+            // ボタンを活性化（未取得状態）
+            takeBtn.disabled = false;
+            takeBtn.innerText = "[ インベントリに取る ]";
         }
 
         function updateDisplay() {
@@ -238,6 +278,14 @@
             document.getElementById('inv-count').innerText = inventory.length;
             document.getElementById('rev-lv').innerText = revLv;
             
+            // リバース素材の表示更新
+            const reqDisplay = document.getElementById('req-display');
+            if (revLv >= 5) {
+                reqDisplay.innerText = "【リバースMAX達成！これ以上の進化はありません】";
+            } else {
+                reqDisplay.innerText = "必要素材: " + reqs[revLv].join(" ＋ ");
+            }
+
             const invDiv = document.getElementById('inventory');
             if (inventory.length === 0) {
                 invDiv.innerHTML = '<span style="color: #666; font-size: 0.8rem;">インベントリは空です</span>';
@@ -253,12 +301,21 @@
         }
 
         function takeCharacter() {
-            if (!currentChar) return;
+            if (!currentChar || isAlreadyTaken) return;
+
             if (inventory.length >= invMax) {
                 alert("⚠ エラー: インベントリが満タンです！（上限 " + invMax + " 個）\n不要なキャラを削除するかリバースしてください。");
                 return;
             }
+
             inventory.push({ ...currentChar });
+            isAlreadyTaken = true; // 取得済みフラグを立てる
+
+            // ボタンを無効化
+            const takeBtn = document.getElementById('take-btn');
+            takeBtn.disabled = true;
+            takeBtn.innerText = "✔ 取得済み";
+
             updateDisplay();
         }
 
@@ -268,14 +325,6 @@
         }
 
         function attemptReverse() {
-            const reqs = [
-                ["溶けかけの豆", "加熱えだまめ"],
-                ["加熱えだまめ", "ビーン・マシン"],
-                ["エダマメ・マシン"],
-                ["Beans soramame"],
-                ["ツブヨンコ・エダまめ"]
-            ];
-
             if (revLv >= 5) {
                 alert("✨ リバースは既に限界（Lv.5）に達しています！");
                 return;
@@ -284,7 +333,6 @@
             let needed = reqs[revLv];
             let canReverse = true;
 
-            // 素材チェック（名前に部分一致するものを含むか）
             for (let reqName of needed) {
                 const foundIndex = inventory.findIndex(i => i.name.includes(reqName));
                 if (foundIndex === -1) {
@@ -294,7 +342,6 @@
             }
 
             if (canReverse) {
-                // 素材を消費
                 needed.forEach(reqName => {
                     const foundIndex = inventory.findIndex(i => i.name.includes(reqName));
                     if (foundIndex !== -1) {
@@ -307,23 +354,28 @@
                 alert("🎉 リバース成功！空間が歪み、インベントリ上限が +2 されました！（現在上限: " + invMax + "）");
                 updateDisplay();
             } else {
-                alert("❌ 素材が足りません！\nリバースLv." + (revLv + 1) + "に必要な素材を確認してください。");
+                alert("❌ 素材が足りません！\n現在の必要素材: " + needed.join(" と "));
             }
         }
 
-        // 10秒タイマーとループ
+        // 10秒タイマーとプログレスバーの制御
         setInterval(() => {
             timeLeft--;
+            
+            // プログレスバーの長さを更新 (10秒 = 100% から 0%)
+            const bar = document.getElementById('timer-bar');
+            bar.style.width = (timeLeft * 10) + "%";
+
             if (timeLeft <= 0) {
                 runGameLoop();
                 timeLeft = 10;
+                bar.style.width = "100%";
             }
-            document.getElementById('timer').innerText = "NEXT SUMMON: " + timeLeft + "s";
+            document.getElementById('timer-text').innerText = "NEXT SUMMON: " + timeLeft + "s";
         }, 1000);
 
         // 初期起動
         runGameLoop();
-        updateDisplay();
     </script>
 </body>
 </html>
