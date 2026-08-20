@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SORAMAME OF BRAINROT -ECONOMY & CRAFT UPDATE-</title>
+    <title>SORAMAME OF BRAINROT -SAVE UPDATE-</title>
     <style>
         body { 
             margin: 0; 
@@ -290,8 +290,12 @@
             <input type="checkbox" id="admin-rich-check" style="width: auto;"> 💰 所持コインを +1,000,000 にする
         </label>
 
+        <label style="display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0; border-top: 1px dashed #ff0055; padding-top: 8px;">
+            <input type="checkbox" id="admin-reset-check" style="width: auto;"> ⚠️ セーブデータを完全初期化する
+        </label>
+
         <div style="text-align: center; margin-top: 15px;">
-            <button onclick="applyAdminSettings()" style="border-color: #39ff14; color: #39ff14;">[ 設定を適用して即召喚 ]</button>
+            <button onclick="applyAdminSettings()" style="border-color: #39ff14; color: #39ff14;">[ 設定を適用 ]</button>
             <button onclick="closeAdminModal()" style="border-color: #ff0055; color: #ff0055; margin-top: 8px;">閉じる</button>
         </div>
     </dialog>
@@ -371,6 +375,32 @@
         let adminForceChar = "random";
         let adminForceMutant = false;
 
+        // セーブ機能 (localStorage)
+        function saveGame() {
+            const saveData = {
+                coins: coins,
+                inventory: inventory,
+                revLv: revLv,
+                invMax: invMax
+            };
+            localStorage.setItem('soramameGameData', JSON.stringify(saveData));
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('soramameGameData');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    coins = typeof data.coins === 'number' ? data.coins : 100;
+                    inventory = Array.isArray(data.inventory) ? data.inventory : [];
+                    revLv = typeof data.revLv === 'number' ? data.revLv : 0;
+                    invMax = typeof data.invMax === 'number' ? data.invMax : 10;
+                } catch(e) {
+                    console.error("セーブデータのロードに失敗しました", e);
+                }
+            }
+        }
+
         function verifySecretCode() {
             const userInput = document.getElementById('secret-input').value.trim();
             const targetCode = "8101145141919";
@@ -422,7 +452,6 @@
             osc.stop(audioCtx.currentTime + 0.9);
         }
         
-        // キャラクター定義（価格 cost と 秒間収益 dps を設定）
         const chars = [
             { name: "普通のソラマメ", chance: 50.0, rarity: "common", label: "Common", cost: 10, dps: 1 },
             { name: "溶けかけの豆", chance: 20.0, rarity: "rare", label: "Rare", cost: 50, dps: 5 },
@@ -550,7 +579,6 @@
             document.getElementById('inv-count').innerText = inventory.length;
             document.getElementById('rev-lv').innerText = revLv;
             
-            // 総DPS計算
             let totalDps = inventory.reduce((sum, item) => sum + item.dps, 0);
             document.getElementById('dps-display').innerText = totalDps;
 
@@ -597,14 +625,15 @@
             takeBtn.innerText = "✔ 取得済み";
 
             updateDisplay();
+            saveGame(); // 自動セーブ
         }
 
         function deleteItem(idx) {
             inventory.splice(idx, 1);
             updateDisplay();
+            saveGame(); // 自動セーブ
         }
 
-        // クラフト実行処理
         function attemptCraft() {
             const idx1 = inventory.findIndex(i => i.name.includes("ツブヨンコ・エダまめ"));
             const idx2 = inventory.findIndex(i => i.name.includes("ジャック・ソラマメ"));
@@ -624,6 +653,7 @@
                 playBeanSound();
                 alert("👑 クラフト大成功！！最強の『ツブヨンコ・ソラマメ』が誕生しました！！");
                 updateDisplay();
+                saveGame(); // 自動セーブ
             } else {
                 alert("❌ クラフト素材が足りません！\nインベントリに「ツブヨンコ・エダまめ」と「ジャック・ソラマメ」の両方が必要です。");
             }
@@ -658,12 +688,25 @@
                 invMax += 2;
                 alert("🎉 リバース成功！空間が歪み、インベントリ上限が +2 されました！（現在上限: " + invMax + "）");
                 updateDisplay();
+                saveGame(); // 自動セーブ
             } else {
                 alert("❌ 素材が足りません！\n現在の必要素材: " + needed.join(" と "));
             }
         }
 
         function applyAdminSettings() {
+            // 初期化チェック
+            if (document.getElementById('admin-reset-check').checked) {
+                if (confirm("⚠️ 本当にすべてのセーブデータを初期化しますか？")) {
+                    localStorage.removeItem('soramameGameData');
+                    coins = 100;
+                    inventory = [];
+                    revLv = 0;
+                    invMax = 10;
+                    alert("🗑️ セーブデータを初期化しました。");
+                }
+            }
+
             adminForceChar = document.getElementById('admin-target-char').value;
             adminForceMutant = document.getElementById('admin-mutant-check').checked;
             
@@ -676,7 +719,8 @@
             }
 
             document.getElementById('admin-dialog').close();
-            alert("⚙️ 管理者設定を適用しました！");
+            saveGame();
+            alert("⚙️ 管理者設定を適用してセーブしました！");
             
             timeLeft = 0;
             runGameLoop();
@@ -701,14 +745,18 @@
             document.getElementById('admin-dialog').close();
         }
 
+        // 起動時にロードを実行
+        loadGame();
+
         // メインタイマー ＆ コイン自動収集ループ (1秒ごと)
         setInterval(() => {
-            // コインの自動生産
             let dps = inventory.reduce((sum, item) => sum + item.dps, 0);
-            coins += dps;
-            updateDisplay();
+            if (dps > 0) {
+                coins += dps;
+                updateDisplay();
+                // 10秒に1回くらい自動で裏セーブする処理も兼ねる
+            }
 
-            // 召喚タイマー
             timeLeft--;
             const bar = document.getElementById('timer-bar');
             bar.style.width = (timeLeft * 10) + "%";
@@ -717,6 +765,7 @@
                 runGameLoop();
                 timeLeft = 10;
                 bar.style.width = "100%";
+                saveGame(); // 1ターンごとに自動セーブ
             }
             document.getElementById('timer-text').innerText = "NEXT SUMMON: " + timeLeft + "s";
         }, 1000);
