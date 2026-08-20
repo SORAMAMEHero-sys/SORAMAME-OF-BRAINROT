@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SORAMAME OF BRAINROT -INFLATION UPDATE-</title>
+    <title>SORAMAME OF BRAINROT -SOUND UPDATE-</title>
     <style>
         body { 
             margin: 0; 
@@ -326,7 +326,7 @@
         </label>
 
         <label style="display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0; border-top: 1px dashed #ff0055; padding-top: 8px;">
-            <input type="checkbox" id="admin-reset-check" style="width: auto;"> ⚠️ セーブデータを完全初期化する（※50万Gにリセット）
+            <input type="checkbox" id="admin-reset-check" style="width: auto;"> ⚠️ セーブデータを完全初期化する（50万G）
         </label>
 
         <div style="text-align: center; margin-top: 15px;">
@@ -401,7 +401,7 @@
         let inventory = [];
         let invMax = 10;
         let revLv = 0;
-        let coins = 500000; // 初期所持金 50万G
+        let coins = 500000;
         let currentChar = null;
         let timeLeft = 10;
         let isAlreadyTaken = false;
@@ -456,21 +456,64 @@
             }
         }
 
+        // --- サウンド生成エンジン (Web Audio API) ---
         let audioCtx = null;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
         }
 
-        function playSecretSound() {
+        // 1. Common / Rare 出現音（ポンッ！ピコッ！）
+        function playCommonSound(isRare = false) {
             initAudio();
             if(!audioCtx) return;
-            const notes = [523.25, 659.25, 783.99, 1046.50];
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = isRare ? "triangle" : "sine";
+            let startFreq = isRare ? 440 : 300;
+            let endFreq = isRare ? 880 : 150;
+            osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.15);
+        }
+
+        // 2. Got (虹色) 出現音（キラキラ・アルペジオ）
+        function playGotSound() {
+            initAudio();
+            if(!audioCtx) return;
+            const notes = [523.25, 659.25, 783.99, 987.77, 1046.50]; // ド・ミ・ソ・シ・高ド
             notes.forEach((freq, i) => {
                 let osc = audioCtx.createOscillator();
                 let gain = audioCtx.createGain();
                 osc.type = "sine";
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.06);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime + i * 0.06);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.06 + 0.25);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + i * 0.06);
+                osc.stop(audioCtx.currentTime + i * 0.06 + 0.25);
+            });
+        }
+
+        // 3. Secret (黒) 出現音（ダークで不気味な低音）
+        function playSecretSound() {
+            initAudio();
+            if(!audioCtx) return;
+            const notes = [150, 130, 110, 90];
+            notes.forEach((freq, i) => {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = "sawtooth";
                 osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.08);
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.08);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime + i * 0.08);
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.08 + 0.3);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
@@ -479,6 +522,7 @@
             });
         }
 
+        // 4. BEAN / CRAFT 出現音（重低音・ド迫力）
         function playBeanSound() {
             initAudio();
             if(!audioCtx) return;
@@ -486,16 +530,16 @@
             let gain = audioCtx.createGain();
             osc.type = "sawtooth";
             osc.frequency.setValueAtTime(110, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(45, audioCtx.currentTime + 0.8);
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.9);
+            osc.frequency.exponentialRampToValueAtTime(35, audioCtx.currentTime + 0.9);
+            gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.95);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.start(audioCtx.currentTime);
-            osc.stop(audioCtx.currentTime + 0.9);
+            osc.stop(audioCtx.currentTime + 0.95);
         }
-        
-        // コストをすべて100倍に調整
+
+        // キャラクターデータ（コスト100倍・初期50万G）
         const chars = [
             { name: "普通のソラマメ", chance: 50.0, rarity: "common", label: "Common", cost: 1000, dps: 1 },
             { name: "溶けかけの豆", chance: 20.0, rarity: "rare", label: "Rare", cost: 5000, dps: 5 },
@@ -590,7 +634,14 @@
             isAlreadyTaken = false;
             timeLeft = 10;
 
-            if (currentChar.rarity === 'secret') {
+            // --- レアリティに応じた出現サウンドの再生 ---
+            if (currentChar.rarity === 'common') {
+                playCommonSound(false);
+            } else if (currentChar.rarity === 'rare') {
+                playCommonSound(true);
+            } else if (currentChar.rarity === 'got') {
+                playGotSound();
+            } else if (currentChar.rarity === 'secret') {
                 playSecretSound();
             } else if (currentChar.rarity === 'bean' || currentChar.rarity === 'craft') {
                 playBeanSound();
@@ -791,7 +842,7 @@
             document.getElementById('admin-dialog').close();
         }
 
-        // 起動時にロード（初めての場合は50万Gから）
+        // 起動時にロード
         loadGame();
 
         if (!currentChar) {
