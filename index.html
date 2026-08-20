@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SORAMAME OF BRAINROT -ULTIMATE SECRET UPDATE-</title>
+    <title>SORAMAME OF BRAINROT -GOD MODE UPDATE-</title>
     <style>
         body { 
             margin: 0; 
@@ -190,8 +190,8 @@
             color: #00ffff;
             border: 2px solid #00ffff;
             padding: 20px;
-            max-width: 400px;
-            width: 80%;
+            max-width: 420px;
+            width: 85%;
             font-family: 'Courier New', Courier, monospace;
             box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
         }
@@ -214,15 +214,21 @@
             color: #ffaa00;
             font-weight: bold;
         }
-        input[type="text"] {
+        input[type="text"], select {
             background: #000;
             border: 1px solid #ff00ff;
             color: #ff00ff;
             padding: 8px;
             font-family: 'Courier New', Courier, monospace;
-            width: 80%;
+            width: 90%;
             margin-bottom: 10px;
             text-align: center;
+        }
+        label {
+            font-size: 0.85rem;
+            color: #ff00ff;
+            display: block;
+            margin-top: 8px;
         }
     </style>
 </head>
@@ -231,6 +237,7 @@
     <button id="secret-btn" onclick="openSecretModal()" title="シークレットコード入力">🤫</button>
     <button id="phone-btn" onclick="openScheduleModal()" title="イベント予定表">📱</button>
 
+    <!-- シークレットコード入力ダイアログ -->
     <dialog id="secret-dialog">
         <h3 style="color: #ff00ff; border-color: #ff00ff;">🤫 シークレットコード</h3>
         <p style="font-size: 0.85rem; color: #aaa;">隠されたコードを入力せよ……</p>
@@ -239,6 +246,44 @@
         <button onclick="closeSecretModal()" style="border-color: #555; color: #555; margin-left: 5px;">閉じる</button>
     </dialog>
 
+    <!-- 管理者パネルダイアログ -->
+    <dialog id="admin-dialog">
+        <h3 style="color: #39ff14; border-color: #39ff14;">⚙️ ADMIN PANEL (管理者)</h3>
+        
+        <label>🎯 次に出るキャラクターの強制指定:</label>
+        <select id="admin-target-char">
+            <option value="random">ランダム（通常抽選）</option>
+            <option value="普通のソラマメ">普通のソラマメ</option>
+            <option value="溶けかけの豆">溶けかけの豆</option>
+            <option value="加熱えだまめ">加熱えだまめ</option>
+            <option value="ビーン・マシン">ビーン・マシン</option>
+            <option value="エダマメ・マシン">エダマメ・マシン</option>
+            <option value="Beans soramame">Beans soramame</option>
+            <option value="ツブヨンコ・エダまめ">ツブヨンコ・エダまめ</option>
+            <option value="【BEAN】ジャック・ソラマメ">【BEAN】ジャック・ソラマメ</option>
+        </select>
+
+        <label style="display: flex; align-items: center; justify-content: center; gap: 8px; margin: 10px 0;">
+            <input type="checkbox" id="admin-mutant-check" style="width: auto;"> 🫛 マメ変異を強制発生させる
+        </label>
+
+        <label>⚡ リバース数（Lv. 0〜5）の設定:</label>
+        <select id="admin-rev-select">
+            <option value="0">Lv. 0 (上限 10)</option>
+            <option value="1">Lv. 1 (上限 12)</option>
+            <option value="2">Lv. 2 (上限 14)</option>
+            <option value="3">Lv. 3 (上限 16)</option>
+            <option value="4">Lv. 4 (上限 18)</option>
+            <option value="5">Lv. 5 (上限 20 / MAX)</option>
+        </select>
+
+        <div style="text-align: center; margin-top: 15px;">
+            <button onclick="applyAdminSettings()" style="border-color: #39ff14; color: #39ff14;">[ 設定を適用して即召喚 ]</button>
+            <button onclick="closeAdminModal()" style="border-color: #ff0055; color: #ff0055; margin-top: 8px;">閉じる</button>
+        </div>
+    </dialog>
+
+    <!-- イベント予定表ダイアログ -->
     <dialog id="schedule-dialog">
         <h3>📱 サーバーイベント予定表</h3>
         <div class="schedule-item">
@@ -293,21 +338,6 @@
     </div>
 
     <script>
-        // 確実判定システム（スマホの自動補正やスペース混入を対策）
-        function verifySecretCode() {
-            const userInput = document.getElementById('secret-input').value.trim();
-            const targetCode = "8101145141919";
-            
-            if (userInput === targetCode) {
-                alert("🎉 シークレットコード認証成功！超激レア豆が支給されました！");
-                inventory.push({ name: "【🤫SECRET】ブレインロット・マメ", rarity: "bean", label: "SECRET-BEAN" });
-                updateDisplay();
-                closeSecretModal();
-            } else {
-                alert("❌ コードが違います。");
-            }
-        }
-
         let inventory = [];
         let invMax = 10;
         let revLv = 0;
@@ -315,6 +345,23 @@
         let timeLeft = 10;
         let isAlreadyTaken = false;
         let lastEventKey = "";
+
+        // 管理者用の強制オーバーライド設定
+        let adminForceChar = "random";
+        let adminForceMutant = false;
+
+        // シークレットコード認証（管理者パネル召喚）
+        function verifySecretCode() {
+            const userInput = document.getElementById('secret-input').value.trim();
+            const targetCode = "8101145141919";
+            
+            if (userInput === targetCode) {
+                closeSecretModal();
+                document.getElementById('admin-dialog').showModal();
+            } else {
+                alert("❌ コードが違います。");
+            }
+        }
 
         let audioCtx = null;
         function initAudio() {
@@ -403,32 +450,45 @@
             let msg = "SYSTEM: 通常稼働中";
             let rackMultiplier = 1;
 
-            if (h === 21 && m >= 0 && m <= 3) {
-                rackMultiplier = 10;
-                msg = "🖥️ 【10倍サーバーラック起動中！！】高レア確率10倍暴走中！";
-            } 
-            else if ((h === 18 && m >= 30) || (h === 19 && m < 30)) {
-                rackMultiplier = 2;
-            }
-
-            if (h === 18 && m === 0 && lastEventKey !== eventKey) {
-                display = { ...chars.find(c => c.name === "Beans soramame") };
-                msg = "⚡ 【緊急】シークレット確定イベント発動！！";
-                lastEventKey = eventKey;
-            } 
-            else if (h === 20 && m === 0 && lastEventKey !== eventKey) {
-                const isBeanHit = Math.random() < 0.015;
-                display = isBeanHit ? { ...chars.find(c => c.name.includes("ジャック")) } : drawNormal(1);
-                msg = "🔥 【熱狂】ビーンチャンス！1.5%でジャック降臨！";
-                lastEventKey = eventKey;
-            } 
-            else {
-                display = drawNormal(rackMultiplier);
-                if ((h === 18 && m >= 30) || (h === 19 && m < 30)) {
-                    if(Math.random() < 0.1) {
+            // 管理者強制設定のチェック
+            if (adminForceChar !== "random") {
+                let found = chars.find(c => c.name === adminForceChar);
+                if (found) {
+                    display = { ...found };
+                    if (adminForceMutant && !display.name.startsWith("🫛")) {
                         display.name = "🫛" + display.name;
                     }
-                    msg = "🫛 【異常】マメ変異発生中 ＋ 🖥️ 2倍ラック稼働中";
+                    msg = "⚙️ 【管理者権限】キャラ強制指定 ＆ 変異設定適用中！";
+                }
+                adminForceChar = "random"; // 一回適用したらリセット
+            } else {
+                if (h === 21 && m >= 0 && m <= 3) {
+                    rackMultiplier = 10;
+                    msg = "🖥️ 【10倍サーバーラック起動中！！】高レア確率10倍暴走中！";
+                } 
+                else if ((h === 18 && m >= 30) || (h === 19 && m < 30)) {
+                    rackMultiplier = 2;
+                }
+
+                if (h === 18 && m === 0 && lastEventKey !== eventKey) {
+                    display = { ...chars.find(c => c.name === "Beans soramame") };
+                    msg = "⚡ 【緊急】シークレット確定イベント発動！！";
+                    lastEventKey = eventKey;
+                } 
+                else if (h === 20 && m === 0 && lastEventKey !== eventKey) {
+                    const isBeanHit = Math.random() < 0.015;
+                    display = isBeanHit ? { ...chars.find(c => c.name.includes("ジャック")) } : drawNormal(1);
+                    msg = "🔥 【熱狂】ビーンチャンス！1.5%でジャック降臨！";
+                    lastEventKey = eventKey;
+                } 
+                else {
+                    display = drawNormal(rackMultiplier);
+                    if ((h === 18 && m >= 30) || (h === 19 && m < 30)) {
+                        if(Math.random() < 0.1) {
+                            display.name = "🫛" + display.name;
+                        }
+                        msg = "🫛 【異常】マメ変異発生中 ＋ 🖥️ 2倍ラック稼働中";
+                    }
                 }
             }
 
@@ -545,6 +605,23 @@
             }
         }
 
+        // 管理者設定の適用処理
+        function applyAdminSettings() {
+            adminForceChar = document.getElementById('admin-target-char').value;
+            adminForceMutant = document.getElementById('admin-mutant-check').checked;
+            
+            let selectedRev = parseInt(document.getElementById('admin-rev-select').value);
+            revLv = selectedRev;
+            invMax = 10 + (revLv * 2);
+
+            document.getElementById('admin-dialog').close();
+            alert("⚙️ 管理者設定を適用しました！直ちに指定キャラを召喚します！");
+            
+            timeLeft = 0; // すぐに次のループ（召喚）を走らせる
+            runGameLoop();
+            timeLeft = 10;
+        }
+
         function openScheduleModal() {
             document.getElementById('schedule-dialog').showModal();
         }
@@ -558,6 +635,9 @@
         function closeSecretModal() {
             document.getElementById('secret-dialog').close();
             document.getElementById('secret-input').value = "";
+        }
+        function closeAdminModal() {
+            document.getElementById('admin-dialog').close();
         }
 
         setInterval(() => {
