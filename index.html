@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SORAMAME OF BRAINROT -FIXED UPDATE-</title>
+    <title>SORAMAME OF BRAINROT -FIXED UPDATE 2-</title>
     <style>
         body { 
             margin: 0; 
@@ -306,7 +306,7 @@
         <div class="schedule-item">
             <span class="schedule-time">⏰ 18:00 (1分間)</span><br>
             ・**シークレット確定イベント**<br>
-            <span style="font-size: 0.8rem; color:#aaa;">必ず「Beans soramame」が出現！</span>
+            <span style="font-size: 0.8rem; color:#aaa;">必ずキラキラ「Beans soramame」が出現！</span>
         </div>
         <div class="schedule-item">
             <span class="schedule-time">⏰ 18:30 〜 19:00</span><br>
@@ -375,7 +375,6 @@
         let adminForceChar = "random";
         let adminForceMutant = false;
 
-        // セーブ機能 (localStorage) - 現在のキャラクターやタイマーも保存してリセマラ防止
         function saveGame() {
             const saveData = {
                 coins: coins,
@@ -403,7 +402,6 @@
                         currentChar = data.currentChar;
                         timeLeft = typeof data.timeLeft === 'number' ? data.timeLeft : 10;
                         isAlreadyTaken = typeof data.isAlreadyTaken === 'boolean' ? data.isAlreadyTaken : false;
-                        renderStage();
                     }
                 } catch(e) {
                     console.error("セーブデータのロードに失敗しました", e);
@@ -554,7 +552,7 @@
 
             currentChar = display;
             isAlreadyTaken = false;
-            timeLeft = 10; // 確実に10秒からスタートさせる
+            timeLeft = 10;
 
             if (currentChar.rarity === 'secret') {
                 playSecretSound();
@@ -582,11 +580,10 @@
             
             if (isAlreadyTaken) {
                 takeBtn.disabled = true;
-                takeBtn.innerText = "取得";
+                takeBtn.innerText = "✔ 取得済み";
             } else {
                 takeBtn.disabled = false;
-                document.getElementById('cost-display').innerText = currentChar.cost;
-                takeBtn.innerText = `[ 取得 (コスト: ${currentChar.cost}G) ]`;
+                takeBtn.innerHTML = `[ 取得する (コスト: <span id="cost-display">${currentChar.cost}</span>G) ]`;
             }
         }
 
@@ -737,8 +734,6 @@
 
             document.getElementById('admin-dialog').close();
             alert("⚙️ 管理者設定を適用しました！");
-            
-            // 即座に新しいキャラをスポーンさせてタイマーを10秒にリセット
             runGameLoop();
         }
 
@@ -760,14 +755,12 @@
             document.getElementById('admin-dialog').close();
         }
 
-        // 起動時にロードを実行
+        // 起動時にロード
         loadGame();
 
-        // もしデータがなく初めて起動した場合は初回スポーン
         if (!currentChar) {
             runGameLoop();
         } else {
-            // ロードできた場合は画面とタイバーを同期
             renderStage();
             updateDisplay();
         }
@@ -788,7 +781,7 @@
             if (timeLeft <= 0) {
                 runGameLoop();
             } else {
-                saveGame(); // 毎秒のタイマー変動も保存
+                saveGame();
             }
             document.getElementById('timer-text').innerText = "NEXT SUMMON: " + timeLeft + "s";
         }, 1000);
