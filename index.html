@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SORAMAME OF BRAINROT -SOUND UPDATE-</title>
+    <title>SORAMAME OF BRAINROT -SERVER RACK UPDATE-</title>
     <style>
         body { 
             margin: 0; 
@@ -17,6 +17,26 @@
             min-height: 100vh; 
             padding: 20px;
             overflow-x: hidden;
+        }
+
+        /* 右上のスマホボタン */
+        #phone-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #111;
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            font-size: 1.5rem;
+            padding: 8px 12px;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 0 10px #00ffff;
+            transition: all 0.2s;
+        }
+        #phone-btn:hover {
+            background: #00ffff;
+            color: #000;
         }
 
         h1 { 
@@ -68,7 +88,6 @@
             background: #111;
         }
 
-        /* プログレスバー（タイマー用） */
         #timer-container {
             width: 100%;
             background: #222;
@@ -84,7 +103,6 @@
             transition: width 1s linear;
         }
 
-        /* キャラクターポップアップアニメーション */
         .character-card {
             animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
             padding: 10px;
@@ -95,7 +113,6 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* レア度ごとのネオン装飾 */
         .rare-common { color: #ffffff; font-size: 1.8rem; }
         .rare-rare { color: #00ffff; font-size: 2rem; text-shadow: 0 0 8px #00ffff; }
         .rare-got { color: #39ff14; font-size: 2.2rem; text-shadow: 0 0 10px #39ff14; }
@@ -149,9 +166,71 @@
             color: #ffaa00;
             margin-bottom: 10px;
         }
+
+        /* モダールダイアログのスタイル */
+        dialog {
+            background: #111;
+            color: #00ffff;
+            border: 2px solid #00ffff;
+            padding: 20px;
+            max-width: 400px;
+            width: 80%;
+            font-family: 'Courier New', Courier, monospace;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+        dialog::backdrop {
+            background: rgba(0, 0, 0, 0.8);
+        }
+        dialog h3 {
+            margin-top: 0;
+            color: #39ff14;
+            text-align: center;
+            border-bottom: 1px dashed #39ff14;
+            padding-bottom: 8px;
+        }
+        .schedule-item {
+            margin: 10px 0;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        .schedule-time {
+            color: #ffaa00;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
+
+    <!-- 右上のスマホボタン -->
+    <button id="phone-btn" onclick="openScheduleModal()" title="イベント予定表">📱</button>
+
+    <!-- イベント予定表ダイアログ -->
+    <dialog id="schedule-dialog">
+        <h3>📱 サーバーイベント予定表</h3>
+        <div class="schedule-item">
+            <span class="schedule-time">⏰ 18:00 (1分間)</span><br>
+            ・**シークレット確定イベント**<br>
+            <span style="font-size: 0.8rem; color:#aaa;">必ず「Beans soramame」が出現！</span>
+        </div>
+        <div class="schedule-item">
+            <span class="schedule-time">⏰ 18:30 〜 19:00</span><br>
+            ・**マメ変異 ＆ 2倍サーバーラック**<br>
+            <span style="font-size: 0.8rem; color:#aaa;">変異確率10% ＋ ラックで確率2倍ブースト！</span>
+        </div>
+        <div class="schedule-item">
+            <span class="schedule-time">⏰ 20:00 (1分間)</span><br>
+            ・**ビーンチャンス**<br>
+            <span style="font-size: 0.8rem; color:#aaa;">1.5%の確率でジャック・ソラマメ降臨！</span>
+        </div>
+        <div class="schedule-item">
+            <span class="schedule-time">⏰ 21:00 〜 21:03</span><br>
+            ・**10倍サーバーラック起動**<br>
+            <span style="font-size: 0.8rem; color:#aaa;">最高峰の10倍確率ブースト発動！</span>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <button onclick="closeScheduleModal()" style="border-color: #ff0055; color: #ff0055;">閉じる</button>
+        </div>
+    </dialog>
 
     <h1>SORAMAME OF BRAINROT</h1>
     <div id="event-msg">SYSTEM: 待機中...</div>
@@ -188,19 +267,16 @@
         let isAlreadyTaken = false;
         let lastEventKey = "";
 
-        // Web Audio APIによるサウンド生成システム
+        // 音声システム
         let audioCtx = null;
         function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
 
-        // シークレット用サウンド（高音キラキラ・神々しい音）
         function playSecretSound() {
             initAudio();
             if(!audioCtx) return;
-            const notes = [523.25, 659.25, 783.99, 1046.50]; // ド・ミ・ソ・高いド
+            const notes = [523.25, 659.25, 783.99, 1046.50];
             notes.forEach((freq, i) => {
                 let osc = audioCtx.createOscillator();
                 let gain = audioCtx.createGain();
@@ -215,15 +291,14 @@
             });
         }
 
-        // ビーン用サウンド（重低音＆不気味なBOSS降臨音）
         function playBeanSound() {
             initAudio();
             if(!audioCtx) return;
             let osc = audioCtx.createOscillator();
             let gain = audioCtx.createGain();
             osc.type = "sawtooth";
-            osc.frequency.setValueAtTime(110, audioCtx.currentTime); // 低音
-            osc.frequency.exponentialRampToValueAtTime(45, audioCtx.currentTime + 0.8); // ズシーンと下がる
+            osc.frequency.setValueAtTime(110, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(45, audioCtx.currentTime + 0.8);
             gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.9);
             osc.connect(gain);
@@ -251,10 +326,23 @@
             ["ツブヨンコ・エダまめ"]
         ];
 
-        function drawNormal() {
-            let r = Math.random() * 100;
+        // サーバーラックの倍率を考慮したガチャ抽選
+        function drawNormal(rackMultiplier = 1) {
+            // 高レア（レア以上）の確率をラック倍率で引き上げる
+            let modifiedChars = chars.map(c => {
+                let currentChance = c.chance;
+                if (c.rarity !== "common") {
+                    currentChance *= rackMultiplier;
+                }
+                return { ...c, chance: currentChance };
+            });
+
+            // 確率合計の再計算
+            let totalChance = modifiedChars.reduce((sum, c) => sum + c.chance, 0);
+            let r = Math.random() * totalChance;
             let sum = 0;
-            for(let c of chars) {
+
+            for(let c of modifiedChars) {
                 sum += c.chance;
                 if(r <= sum) return { ...c };
             }
@@ -268,7 +356,20 @@
             let eventKey = h + "-" + m;
             let display = null;
             let msg = "SYSTEM: 通常稼働中";
+            let rackMultiplier = 1;
 
+            // サーバーラック判定
+            // 1. 21:00〜21:03 は 10倍ラック
+            if (h === 21 && m >= 0 && m <= 3) {
+                rackMultiplier = 10;
+                msg = "🖥️ 【10倍サーバーラック起動中！！】高レア確率10倍暴走中！";
+            } 
+            // 2. 18:30〜19:00 (マメ変異タイム) は 2倍ラック
+            else if ((h === 18 && m >= 30) || (h === 19 && m < 30)) {
+                rackMultiplier = 2;
+            }
+
+            // 個別イベント判定
             if (h === 18 && m === 0 && lastEventKey !== eventKey) {
                 display = { ...chars.find(c => c.name === "Beans soramame") };
                 msg = "⚡ 【緊急】シークレット確定イベント発動！！";
@@ -276,24 +377,24 @@
             } 
             else if (h === 20 && m === 0 && lastEventKey !== eventKey) {
                 const isBeanHit = Math.random() < 0.015;
-                display = isBeanHit ? { ...chars.find(c => c.name.includes("ジャック")) } : drawNormal();
+                display = isBeanHit ? { ...chars.find(c => c.name.includes("ジャック")) } : drawNormal(1);
                 msg = "🔥 【熱狂】ビーンチャンス！1.5%でジャック降臨！";
                 lastEventKey = eventKey;
             } 
             else {
-                display = drawNormal();
+                display = drawNormal(rackMultiplier);
+                // マメ変異の追加演出 (18:30〜19:00)
                 if ((h === 18 && m >= 30) || (h === 19 && m < 30)) {
                     if(Math.random() < 0.1) {
                         display.name = "🫛" + display.name;
                     }
-                    msg = "🫛 【異常】マメ変異発生中 (変異確率10%)";
+                    msg = "🫛 【異常】マメ変異発生中 ＋ 🖥️ 2倍ラック稼働中";
                 }
             }
 
             currentChar = display;
             isAlreadyTaken = false;
 
-            // レア度に応じたサウンドの再生判定
             if (currentChar.rarity === 'secret') {
                 playSecretSound();
             } else if (currentChar.rarity === 'bean') {
@@ -402,6 +503,14 @@
             } else {
                 alert("❌ 素材が足りません！\n現在の必要素材: " + needed.join(" と "));
             }
+        }
+
+        // スマホダイアログの開閉制御
+        function openScheduleModal() {
+            document.getElementById('schedule-dialog').showModal();
+        }
+        function closeScheduleModal() {
+            document.getElementById('schedule-dialog').close();
         }
 
         setInterval(() => {
