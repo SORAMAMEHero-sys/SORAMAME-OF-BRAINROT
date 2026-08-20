@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SORAMAME OF BRAINROT -SOUND UPDATE-</title>
+    <title>SORAMAME OF BRAINROT -INSTANT UPDATE-</title>
     <style>
         body { 
             margin: 0; 
@@ -130,13 +130,8 @@
         }
 
         .character-card {
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
             padding: 8px;
-        }
-
-        @keyframes popIn {
-            0% { transform: scale(0); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+            /* 戻る時のアニメーションを無くし、常に即時表示にするためアニメーション指定を削除 */
         }
 
         .rare-common { color: #ffffff; font-size: 1.6rem; }
@@ -465,7 +460,6 @@
             }
         }
 
-        // 1. Common / Rare 出現音（ポンッ！ピコッ！）
         function playCommonSound(isRare = false) {
             initAudio();
             if(!audioCtx) return;
@@ -484,11 +478,10 @@
             osc.stop(audioCtx.currentTime + 0.15);
         }
 
-        // 2. Got (虹色) 出現音（キラキラ・アルペジオ）
         function playGotSound() {
             initAudio();
             if(!audioCtx) return;
-            const notes = [523.25, 659.25, 783.99, 987.77, 1046.50]; // ド・ミ・ソ・シ・高ド
+            const notes = [523.25, 659.25, 783.99, 987.77, 1046.50];
             notes.forEach((freq, i) => {
                 let osc = audioCtx.createOscillator();
                 let gain = audioCtx.createGain();
@@ -503,7 +496,6 @@
             });
         }
 
-        // 3. Secret (黒) 出現音（ダークで不気味な低音）
         function playSecretSound() {
             initAudio();
             if(!audioCtx) return;
@@ -522,7 +514,6 @@
             });
         }
 
-        // 4. BEAN / CRAFT 出現音（重低音・ド迫力）
         function playBeanSound() {
             initAudio();
             if(!audioCtx) return;
@@ -539,7 +530,6 @@
             osc.stop(audioCtx.currentTime + 0.95);
         }
 
-        // キャラクターデータ（コスト100倍・初期50万G）
         const chars = [
             { name: "普通のソラマメ", chance: 50.0, rarity: "common", label: "Common", cost: 1000, dps: 1 },
             { name: "溶けかけの豆", chance: 20.0, rarity: "rare", label: "Rare", cost: 5000, dps: 5 },
@@ -659,6 +649,7 @@
 
             if (!currentChar) return;
 
+            // 瞬間移動（一瞬で切り替え）するため、HTMLを直接置き換える
             stage.innerHTML = `
                 <div>${currentChar.name}</div>
                 <div style="font-size: 0.8rem; margin-top: 4px; opacity: 0.7;">[ RARITY: ${currentChar.label} | 収益: +${currentChar.dps}G/s ]</div>
@@ -842,7 +833,6 @@
             document.getElementById('admin-dialog').close();
         }
 
-        // 起動時にロード
         loadGame();
 
         if (!currentChar) {
@@ -852,7 +842,6 @@
             updateDisplay();
         }
 
-        // メインタイマー ＆ コイン自動収集ループ (1秒ごと)
         setInterval(() => {
             let dps = inventory.reduce((sum, item) => sum + item.dps, 0);
             if (dps > 0) {
