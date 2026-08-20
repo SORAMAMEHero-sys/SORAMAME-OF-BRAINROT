@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SORAMAME OF BRAINROT -SAVE UPDATE-</title>
+    <title>SORAMAME OF BRAINROT -FIXED UPDATE-</title>
     <style>
         body { 
             margin: 0; 
@@ -375,13 +375,16 @@
         let adminForceChar = "random";
         let adminForceMutant = false;
 
-        // セーブ機能 (localStorage)
+        // セーブ機能 (localStorage) - 現在のキャラクターやタイマーも保存してリセマラ防止
         function saveGame() {
             const saveData = {
                 coins: coins,
                 inventory: inventory,
                 revLv: revLv,
-                invMax: invMax
+                invMax: invMax,
+                currentChar: currentChar,
+                timeLeft: timeLeft,
+                isAlreadyTaken: isAlreadyTaken
             };
             localStorage.setItem('soramameGameData', JSON.stringify(saveData));
         }
@@ -395,6 +398,13 @@
                     inventory = Array.isArray(data.inventory) ? data.inventory : [];
                     revLv = typeof data.revLv === 'number' ? data.revLv : 0;
                     invMax = typeof data.invMax === 'number' ? data.invMax : 10;
+                    
+                    if (data.currentChar) {
+                        currentChar = data.currentChar;
+                        timeLeft = typeof data.timeLeft === 'number' ? data.timeLeft : 10;
+                        isAlreadyTaken = typeof data.isAlreadyTaken === 'boolean' ? data.isAlreadyTaken : false;
+                        renderStage();
+                    }
                 } catch(e) {
                     console.error("セーブデータのロードに失敗しました", e);
                 }
@@ -544,6 +554,7 @@
 
             currentChar = display;
             isAlreadyTaken = false;
+            timeLeft = 10; // 確実に10秒からスタートさせる
 
             if (currentChar.rarity === 'secret') {
                 playSecretSound();
@@ -554,6 +565,7 @@
             document.getElementById('event-msg').innerText = msg;
             renderStage();
             updateDisplay();
+            saveGame();
         }
 
         function renderStage() {
@@ -568,9 +580,14 @@
             `;
             stage.className = "character-card rare-" + currentChar.rarity;
             
-            takeBtn.disabled = false;
-            document.getElementById('cost-display').innerText = currentChar.cost;
-            takeBtn.innerText = `[ 取得する (コスト: ${currentChar.cost}G) ]`;
+            if (isAlreadyTaken) {
+                takeBtn.disabled = true;
+                takeBtn.innerText = "✔ 取得済み";
+            } else {
+                takeBtn.disabled = false;
+                document.getElementById('cost-display').innerText = currentChar.cost;
+                takeBtn.innerText = `[ 取得する (コスト: ${currentChar.cost}G) ]`;
+            }
         }
 
         function updateDisplay() {
@@ -625,13 +642,13 @@
             takeBtn.innerText = "✔ 取得済み";
 
             updateDisplay();
-            saveGame(); // 自動セーブ
+            saveGame();
         }
 
         function deleteItem(idx) {
             inventory.splice(idx, 1);
             updateDisplay();
-            saveGame(); // 自動セーブ
+            saveGame();
         }
 
         function attemptCraft() {
@@ -653,7 +670,7 @@
                 playBeanSound();
                 alert("👑 クラフト大成功！！最強の『ツブヨンコ・ソラマメ』が誕生しました！！");
                 updateDisplay();
-                saveGame(); // 自動セーブ
+                saveGame();
             } else {
                 alert("❌ クラフト素材が足りません！\nインベントリに「ツブヨンコ・エダまめ」と「ジャック・ソラマメ」の両方が必要です。");
             }
@@ -688,14 +705,13 @@
                 invMax += 2;
                 alert("🎉 リバース成功！空間が歪み、インベントリ上限が +2 されました！（現在上限: " + invMax + "）");
                 updateDisplay();
-                saveGame(); // 自動セーブ
+                saveGame();
             } else {
                 alert("❌ 素材が足りません！\n現在の必要素材: " + needed.join(" と "));
             }
         }
 
         function applyAdminSettings() {
-            // 初期化チェック
             if (document.getElementById('admin-reset-check').checked) {
                 if (confirm("⚠️ 本当にすべてのセーブデータを初期化しますか？")) {
                     localStorage.removeItem('soramameGameData');
@@ -703,6 +719,7 @@
                     inventory = [];
                     revLv = 0;
                     invMax = 10;
+                    currentChar = null;
                     alert("🗑️ セーブデータを初期化しました。");
                 }
             }
@@ -719,12 +736,10 @@
             }
 
             document.getElementById('admin-dialog').close();
-            saveGame();
-            alert("⚙️ 管理者設定を適用してセーブしました！");
+            alert("⚙️ 管理者設定を適用しました！");
             
-            timeLeft = 0;
+            // 即座に新しいキャラをスポーンさせてタイマーを10秒にリセット
             runGameLoop();
-            timeLeft = 10;
         }
 
         function openScheduleModal() {
@@ -748,29 +763,35 @@
         // 起動時にロードを実行
         loadGame();
 
+        // もしデータがなく初めて起動した場合は初回スポーン
+        if (!currentChar) {
+            runGameLoop();
+        } else {
+            // ロードできた場合は画面とタイバーを同期
+            renderStage();
+            updateDisplay();
+        }
+
         // メインタイマー ＆ コイン自動収集ループ (1秒ごと)
         setInterval(() => {
             let dps = inventory.reduce((sum, item) => sum + item.dps, 0);
             if (dps > 0) {
                 coins += dps;
                 updateDisplay();
-                // 10秒に1回くらい自動で裏セーブする処理も兼ねる
             }
 
             timeLeft--;
             const bar = document.getElementById('timer-bar');
+            if (timeLeft < 0) timeLeft = 0;
             bar.style.width = (timeLeft * 10) + "%";
 
             if (timeLeft <= 0) {
                 runGameLoop();
-                timeLeft = 10;
-                bar.style.width = "100%";
-                saveGame(); // 1ターンごとに自動セーブ
+            } else {
+                saveGame(); // 毎秒のタイマー変動も保存
             }
             document.getElementById('timer-text').innerText = "NEXT SUMMON: " + timeLeft + "s";
         }, 1000);
-
-        runGameLoop();
     </script>
 </body>
 </html>
