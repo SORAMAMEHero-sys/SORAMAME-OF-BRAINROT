@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SORAMAME OF BRAINROT -ULTIMATE COMPLETE-</title>
+    <title>SORAMAME OF BRAINROT -SOUND UPDATE-</title>
     <style>
         body { 
             margin: 0; 
@@ -162,7 +162,6 @@
         </div>
         <button id="take-btn" onclick="takeCharacter()" style="margin-top: 15px;" disabled>[ インベントリに取る ]</button>
         
-        <!-- 10秒タイマーの可視化バー -->
         <div id="timer-text" style="font-size: 0.85rem; margin-top: 8px; color: #ffaa00;">NEXT SUMMON: 10s</div>
         <div id="timer-container">
             <div id="timer-bar"></div>
@@ -186,8 +185,52 @@
         let revLv = 0;
         let currentChar = null;
         let timeLeft = 10;
-        let isAlreadyTaken = false; // 今回のキャラを既に取りましたか？
+        let isAlreadyTaken = false;
         let lastEventKey = "";
+
+        // Web Audio APIによるサウンド生成システム
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // シークレット用サウンド（高音キラキラ・神々しい音）
+        function playSecretSound() {
+            initAudio();
+            if(!audioCtx) return;
+            const notes = [523.25, 659.25, 783.99, 1046.50]; // ド・ミ・ソ・高いド
+            notes.forEach((freq, i) => {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.08);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.08);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.08 + 0.3);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + i * 0.08);
+                osc.stop(audioCtx.currentTime + i * 0.08 + 0.3);
+            });
+        }
+
+        // ビーン用サウンド（重低音＆不気味なBOSS降臨音）
+        function playBeanSound() {
+            initAudio();
+            if(!audioCtx) return;
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = "sawtooth";
+            osc.frequency.setValueAtTime(110, audioCtx.currentTime); // 低音
+            osc.frequency.exponentialRampToValueAtTime(45, audioCtx.currentTime + 0.8); // ズシーンと下がる
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.9);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.9);
+        }
         
         const chars = [
             { name: "普通のソラマメ", chance: 50.0, rarity: "common", label: "Common" },
@@ -200,7 +243,6 @@
             { name: "【BEAN】ジャック・ソラマメ", chance: 0.0005, rarity: "bean", label: "BEAN" }
         ];
 
-        // リバースに必要な素材リスト
         const reqs = [
             ["溶けかけの豆", "加熱えだまめ"],
             ["加熱えだまめ", "ビーン・マシン"],
@@ -249,7 +291,14 @@
             }
 
             currentChar = display;
-            isAlreadyTaken = false; // 新しいキャラが出たので「未取得」にリセット
+            isAlreadyTaken = false;
+
+            // レア度に応じたサウンドの再生判定
+            if (currentChar.rarity === 'secret') {
+                playSecretSound();
+            } else if (currentChar.rarity === 'bean') {
+                playBeanSound();
+            }
             
             document.getElementById('event-msg').innerText = msg;
             renderStage();
@@ -268,7 +317,6 @@
             `;
             stage.className = "character-card rare-" + currentChar.rarity;
             
-            // ボタンを活性化（未取得状態）
             takeBtn.disabled = false;
             takeBtn.innerText = "[ インベントリに取る ]";
         }
@@ -278,12 +326,11 @@
             document.getElementById('inv-count').innerText = inventory.length;
             document.getElementById('rev-lv').innerText = revLv;
             
-            // リバース素材の表示更新
             const reqDisplay = document.getElementById('req-display');
             if (revLv >= 5) {
                 reqDisplay.innerText = "【リバースMAX達成！これ以上の進化はありません】";
             } else {
-                reqDisplay.innerText = "必要素材: " + reqs[revLv].join(" ＋ ");
+                reqDisplay.innerText = "次の素材: " + reqs[revLv].join(" ＋ ");
             }
 
             const invDiv = document.getElementById('inventory');
@@ -309,9 +356,8 @@
             }
 
             inventory.push({ ...currentChar });
-            isAlreadyTaken = true; // 取得済みフラグを立てる
+            isAlreadyTaken = true;
 
-            // ボタンを無効化
             const takeBtn = document.getElementById('take-btn');
             takeBtn.disabled = true;
             takeBtn.innerText = "✔ 取得済み";
@@ -358,11 +404,8 @@
             }
         }
 
-        // 10秒タイマーとプログレスバーの制御
         setInterval(() => {
             timeLeft--;
-            
-            // プログレスバーの長さを更新 (10秒 = 100% から 0%)
             const bar = document.getElementById('timer-bar');
             bar.style.width = (timeLeft * 10) + "%";
 
@@ -374,7 +417,6 @@
             document.getElementById('timer-text').innerText = "NEXT SUMMON: " + timeLeft + "s";
         }, 1000);
 
-        // 初期起動
         runGameLoop();
     </script>
 </body>
