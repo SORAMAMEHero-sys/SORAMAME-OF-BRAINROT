@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SORAMAME OF BRAINROT -COLOR UPDATE-</title>
+    <title>SORAMAME OF BRAINROT -INFLATION UPDATE-</title>
     <style>
         body { 
             margin: 0; 
@@ -139,11 +139,10 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* レアリティ別のカラー・スタイル指定 */
         .rare-common { color: #ffffff; font-size: 1.6rem; }
         .rare-rare { color: #00ffff; font-size: 1.8rem; text-shadow: 0 0 8px #00ffff; }
         
-        /* Got: 虹色アニメーション */
+        /* Got: 虹色 */
         .rare-got { 
             font-size: 2rem; 
             font-weight: bold;
@@ -158,7 +157,7 @@
             100% { filter: hue-rotate(360deg); }
         }
 
-        /* Secret: 黒（ダークな黒＆立体的な白フチ＋影） */
+        /* Secret: 黒 */
         .rare-secret { 
             color: #111111; 
             font-size: 2.2rem; 
@@ -175,7 +174,6 @@
             font-weight: 900; 
         }
 
-        /* Craft: 特殊ゴッドカラー */
         .rare-craft { 
             color: #ff0055; 
             font-size: 2.6rem; 
@@ -328,7 +326,7 @@
         </label>
 
         <label style="display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0; border-top: 1px dashed #ff0055; padding-top: 8px;">
-            <input type="checkbox" id="admin-reset-check" style="width: auto;"> ⚠️ セーブデータを完全初期化する
+            <input type="checkbox" id="admin-reset-check" style="width: auto;"> ⚠️ セーブデータを完全初期化する（※50万Gにリセット）
         </label>
 
         <div style="text-align: center; margin-top: 15px;">
@@ -366,7 +364,7 @@
     </dialog>
 
     <h1>SORAMAME OF BRAINROT</h1>
-    <div id="economy-bar">💰 COIN: <span id="coin-display">100</span> (⚡ <span id="dps-display">0</span>/s)</div>
+    <div id="economy-bar">💰 COIN: <span id="coin-display">500000</span> (⚡ <span id="dps-display">0</span>/s)</div>
     <div id="event-msg">SYSTEM: 待機中...</div>
     
     <div class="box">
@@ -403,7 +401,7 @@
         let inventory = [];
         let invMax = 10;
         let revLv = 0;
-        let coins = 100;
+        let coins = 500000; // 初期所持金 50万G
         let currentChar = null;
         let timeLeft = 10;
         let isAlreadyTaken = false;
@@ -430,7 +428,7 @@
             if (saved) {
                 try {
                     const data = JSON.parse(saved);
-                    coins = typeof data.coins === 'number' ? data.coins : 100;
+                    coins = typeof data.coins === 'number' ? data.coins : 500000;
                     inventory = Array.isArray(data.inventory) ? data.inventory : [];
                     revLv = typeof data.revLv === 'number' ? data.revLv : 0;
                     invMax = typeof data.invMax === 'number' ? data.invMax : 10;
@@ -497,15 +495,16 @@
             osc.stop(audioCtx.currentTime + 0.9);
         }
         
+        // コストをすべて100倍に調整
         const chars = [
-            { name: "普通のソラマメ", chance: 50.0, rarity: "common", label: "Common", cost: 10, dps: 1 },
-            { name: "溶けかけの豆", chance: 20.0, rarity: "rare", label: "Rare", cost: 50, dps: 5 },
-            { name: "加熱えだまめ", chance: 15.0, rarity: "rare", label: "Rare", cost: 120, dps: 12 },
-            { name: "ビーン・マシン", chance: 10.0, rarity: "got", label: "Got", cost: 300, dps: 35 },
-            { name: "エダマメ・マシン", chance: 4.495, rarity: "got", label: "Got", cost: 800, dps: 90 },
-            { name: "Beans soramame", chance: 0.5, rarity: "secret", label: "Secret", cost: 3000, dps: 400 },
-            { name: "ツブヨンコ・エダまめ", chance: 0.0045, rarity: "secret", label: "Secret", cost: 15000, dps: 2500 },
-            { name: "【BEAN】ジャック・ソラマメ", chance: 0.0005, rarity: "bean", label: "BEAN", cost: 50000, dps: 10000 },
+            { name: "普通のソラマメ", chance: 50.0, rarity: "common", label: "Common", cost: 1000, dps: 1 },
+            { name: "溶けかけの豆", chance: 20.0, rarity: "rare", label: "Rare", cost: 5000, dps: 5 },
+            { name: "加熱えだまめ", chance: 15.0, rarity: "rare", label: "Rare", cost: 12000, dps: 12 },
+            { name: "ビーン・マシン", chance: 10.0, rarity: "got", label: "Got", cost: 30000, dps: 35 },
+            { name: "エダマメ・マシン", chance: 4.495, rarity: "got", label: "Got", cost: 80000, dps: 90 },
+            { name: "Beans soramame", chance: 0.5, rarity: "secret", label: "Secret", cost: 300000, dps: 400 },
+            { name: "ツブヨンコ・エダまめ", chance: 0.0045, rarity: "secret", label: "Secret", cost: 1500000, dps: 2500 },
+            { name: "【BEAN】ジャック・ソラマメ", chance: 0.0005, rarity: "bean", label: "BEAN", cost: 5000000, dps: 10000 },
             { name: "👑【CRAFT】ツブヨンコ・ソラマメ", chance: 0, rarity: "craft", label: "CRAFT-GOD", cost: 0, dps: 50000 }
         ];
 
@@ -658,12 +657,12 @@
             if (!currentChar || isAlreadyTaken) return;
 
             if (coins < currentChar.cost) {
-                alert("⚠ コインが足りません！放置してコインを稼ぐか、管理者パネルで補充してください。");
+                alert("⚠ コインが足りません！");
                 return;
             }
 
             if (inventory.length >= invMax) {
-                alert("⚠ エラー: インベントリが満タンです！（上限 " + invMax + " 個）\n不要なキャラを削除するかリバースしてください。");
+                alert("⚠ エラー: インベントリが満タンです！（上限 " + invMax + " 個）");
                 return;
             }
 
@@ -737,7 +736,7 @@
 
                 revLv++;
                 invMax += 2;
-                alert("🎉 リバース成功！空間が歪み、インベントリ上限が +2 されました！（現在上限: " + invMax + "）");
+                alert("🎉 リバース成功！インベントリ上限が +2 されました！（現在上限: " + invMax + "）");
                 updateDisplay();
                 saveGame();
             } else {
@@ -749,12 +748,12 @@
             if (document.getElementById('admin-reset-check').checked) {
                 if (confirm("⚠️ 本当にすべてのセーブデータを初期化しますか？")) {
                     localStorage.removeItem('soramameGameData');
-                    coins = 100;
+                    coins = 500000;
                     inventory = [];
                     revLv = 0;
                     invMax = 10;
                     currentChar = null;
-                    alert("🗑️ セーブデータを初期化しました。");
+                    alert("🗑️ セーブデータを初期化しました（所持金50万G）。");
                 }
             }
 
@@ -792,7 +791,7 @@
             document.getElementById('admin-dialog').close();
         }
 
-        // 起動時にロード
+        // 起動時にロード（初めての場合は50万Gから）
         loadGame();
 
         if (!currentChar) {
