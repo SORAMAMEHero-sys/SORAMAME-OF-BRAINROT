@@ -582,11 +582,11 @@
             
             if (isAlreadyTaken) {
                 takeBtn.disabled = true;
-                takeBtn.innerText = "✔ 取得済み";
+                takeBtn.innerText = "取得";
             } else {
                 takeBtn.disabled = false;
                 document.getElementById('cost-display').innerText = currentChar.cost;
-                takeBtn.innerText = `[ 取得する (コスト: ${currentChar.cost}G) ]`;
+                takeBtn.innerText = `[ 取得 (コスト: ${currentChar.cost}G) ]`;
             }
         }
 
