@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SORAMAME OF BRAINROT -FIXED UPDATE 2-</title>
+    <title>SORAMAME OF BRAINROT -COLOR UPDATE-</title>
     <style>
         body { 
             margin: 0; 
@@ -139,12 +139,49 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
+        /* レアリティ別のカラー・スタイル指定 */
         .rare-common { color: #ffffff; font-size: 1.6rem; }
         .rare-rare { color: #00ffff; font-size: 1.8rem; text-shadow: 0 0 8px #00ffff; }
-        .rare-got { color: #39ff14; font-size: 2rem; text-shadow: 0 0 10px #39ff14; }
-        .rare-secret { color: #ff00ff; font-size: 2.2rem; text-shadow: 0 0 15px #ff00ff; font-style: italic; }
-        .rare-bean { color: #ffaa00; font-size: 2.4rem; text-shadow: 0 0 20px #ff0000; font-weight: 900; }
-        .rare-craft { color: #ff0055; font-size: 2.6rem; text-shadow: 0 0 25px #ff0055; font-weight: 900; }
+        
+        /* Got: 虹色アニメーション */
+        .rare-got { 
+            font-size: 2rem; 
+            font-weight: bold;
+            background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbowFlow 3s linear infinite;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.5));
+        }
+        @keyframes rainbowFlow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        /* Secret: 黒（ダークな黒＆立体的な白フチ＋影） */
+        .rare-secret { 
+            color: #111111; 
+            font-size: 2.2rem; 
+            font-weight: 900;
+            text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff, 0 0 10px #000000;
+            font-style: italic; 
+        }
+
+        /* BEAN: 紫 */
+        .rare-bean { 
+            color: #bf00ff; 
+            font-size: 2.4rem; 
+            text-shadow: 0 0 15px #bf00ff, 0 0 25px #6600cc; 
+            font-weight: 900; 
+        }
+
+        /* Craft: 特殊ゴッドカラー */
+        .rare-craft { 
+            color: #ff0055; 
+            font-size: 2.6rem; 
+            text-shadow: 0 0 25px #ff0055; 
+            font-weight: 900; 
+        }
         
         #inventory { 
             display: flex; 
@@ -306,7 +343,7 @@
         <div class="schedule-item">
             <span class="schedule-time">⏰ 18:00 (1分間)</span><br>
             ・**シークレット確定イベント**<br>
-            <span style="font-size: 0.8rem; color:#aaa;">必ずキラキラ「Beans soramame」が出現！</span>
+            <span style="font-size: 0.8rem; color:#aaa;">必ず「Beans soramame」が出現！</span>
         </div>
         <div class="schedule-item">
             <span class="schedule-time">⏰ 18:30 〜 19:00</span><br>
