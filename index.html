@@ -68,10 +68,11 @@
 
         #economy-bar {
             color: #ffaa00;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             text-shadow: 0 0 8px #ffaa00;
             margin-bottom: 10px;
             font-weight: bold;
+            text-align: center;
         }
 
         @keyframes flicker {
@@ -211,12 +212,7 @@
             margin-bottom: 4px; 
             text-shadow: 0 0 5px #00ffff;
             font-size: 1rem;
-        }
-
-        .req-list {
-            font-size: 0.8rem;
-            color: #ffaa00;
-            margin-bottom: 8px;
+            text-align: center;
         }
 
         dialog {
@@ -300,16 +296,6 @@
             <input type="checkbox" id="admin-mutant-check" style="width: auto;"> 🫛 マメ変異を強制発生させる
         </label>
 
-        <label>⚡ リバース数（Lv. 0〜5）の設定:</label>
-        <select id="admin-rev-select">
-            <option value="0">Lv. 0 (上限 10)</option>
-            <option value="1">Lv. 1 (上限 12)</option>
-            <option value="2">Lv. 2 (上限 14)</option>
-            <option value="3">Lv. 3 (上限 16)</option>
-            <option value="4">Lv. 4 (上限 18)</option>
-            <option value="5">Lv. 5 (上限 20 / MAX)</option>
-        </select>
-
         <label style="display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0;">
             <input type="checkbox" id="admin-rich-check" style="width: auto;"> 💰 所持コインを +1,000,000 にする
         </label>
@@ -352,7 +338,11 @@
     </dialog>
 
     <h1>SORAMAME OF BRAINROT</h1>
-    <div id="economy-bar">💰 COIN: <span id="coin-display">500000</span> (⚡ <span id="dps-display">0</span>/s)</div>
+    <div id="economy-bar">
+        💰 COIN: <span id="coin-display">500000</span> (⚡ <span id="dps-display">0</span>/s)<br>
+        💎 富豪メダル: <span id="rich-medal-count" style="color: #ffeb3b;">0</span>こ | 
+        👑 国家予算メダル: <span id="national-medal-count" style="color: #ff4081;">0</span>こ
+    </div>
     <div id="event-msg">SYSTEM: 待機中...</div>
     
     <div class="box">
@@ -367,28 +357,48 @@
         </div>
     </div>
 
+    <!-- 🎒 インベントリ -->
     <div class="box">
         <h3>インベントリ (<span id="inv-count">0</span>/<span id="inv-max">10</span>)</h3>
         <div id="inventory"></div>
+        <div style="margin-top: 10px;">
+            <button onclick="expandInventory()" style="font-size: 0.85rem; border-color: #39ff14; color: #39ff14;">枠を拡張 (+5枠 / 50,000G〜)</button>
+        </div>
     </div>
 
+    <!-- 🏛️ メダル博物館（ショップ） -->
+    <div class="box" style="border-color: #e91e63;">
+        <h3 style="color: #e91e63;">🏛️ メダル博物館</h3>
+        <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 8px;">クラフトに必要な高価なメダルを購入しよう</p>
+        <button onclick="buyRichMedal()" style="border-color: #e91e63; color: #e91e63; display: block; width: 100%; margin-bottom: 6px;">
+            富豪メダル購入 (500,000G)
+        </button>
+        <button onclick="buyNationalMedal()" style="border-color: #ff4081; color: #ff4081; display: block; width: 100%;">
+            国家予算メダル購入 (10,000,000G)
+        </button>
+    </div>
+
+    <!-- 🧪 クラフトマシン (30分切替 ＆ 画像デザイン形式) -->
     <div class="box" style="border-color: #00ffff;">
-        <h3 style="color: #00ffff;">🧪 クラフトマシン</h3>
-        <div class="req-list">レシピ: ツブヨンコ・エダまめ ＋ ジャック・ソラマメ ＝ 👑ツブヨンコ・ソラマメ</div>
-        <button onclick="attemptCraft()" style="border-color: #00ffff; color: #00ffff;">[ クラフト実行 ]</button>
-    </div>
+        <h3 style="color: #00ffff;">🧪 クラフトマシン (30分毎に切替)</h3>
+        
+        <!-- 画像のデザインを再現したエリア -->
+        <div style="margin: 12px 0; background: #111; padding: 12px; border-radius: 6px; font-family: 'Courier New', Courier, monospace;">
+            <div id="craft-top-text" style="font-size: 0.95rem; color: #ffaa00; font-weight: bold;">素材読み込み中...</div>
+            <div style="font-size: 1.2rem; margin: 4px 0; color: #00ffff; letter-spacing: 4px;">⬇ ⬇ ⬇</div>
+            <div id="craft-result-text" class="rare-got" style="font-size: 1.2rem; font-weight: bold;">結果読み込み中...</div>
+        </div>
 
-    <div class="box">
-        <h3>リバースシステム (Lv.<span id="rev-lv">0</span> / Max 5)</h3>
-        <div class="req-list" id="req-display">次の素材: 読み込み中...</div>
-        <button onclick="attemptReverse()">[ リバース実行 (素材消費) ]</button>
+        <button onclick="attemptCraft()" style="border-color: #00ffff; color: #00ffff;">[ クラフト実行 ]</button>
     </div>
 
     <script>
         let inventory = [];
         let invMax = 10;
-        let revLv = 0;
         let coins = 500000;
+        let richMedals = 0;
+        let nationalMedals = 0;
+
         let currentChar = null;
         let timeLeft = 10;
         let isAlreadyTaken = false;
@@ -401,8 +411,9 @@
             const saveData = {
                 coins: coins,
                 inventory: inventory,
-                revLv: revLv,
                 invMax: invMax,
+                richMedals: richMedals,
+                nationalMedals: nationalMedals,
                 currentChar: currentChar,
                 timeLeft: timeLeft,
                 isAlreadyTaken: isAlreadyTaken
@@ -417,8 +428,9 @@
                     const data = JSON.parse(saved);
                     coins = typeof data.coins === 'number' ? data.coins : 500000;
                     inventory = Array.isArray(data.inventory) ? data.inventory : [];
-                    revLv = typeof data.revLv === 'number' ? data.revLv : 0;
                     invMax = typeof data.invMax === 'number' ? data.invMax : 10;
+                    richMedals = typeof data.richMedals === 'number' ? data.richMedals : 0;
+                    nationalMedals = typeof data.nationalMedals === 'number' ? data.nationalMedals : 0;
                     
                     if (data.currentChar) {
                         currentChar = data.currentChar;
@@ -443,7 +455,7 @@
             }
         }
 
-        // --- サウンド生成エンジン (大音量＆迫力ブースト版) ---
+        // --- サウンド生成エンジン ---
         let audioCtx = null;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -452,7 +464,6 @@
             }
         }
 
-        // 1. Common / Rare (音量大幅アップ: 0.7)
         function playCommonSound(isRare = false) {
             initAudio();
             if(!audioCtx) return;
@@ -471,7 +482,6 @@
             osc.stop(audioCtx.currentTime + 0.15);
         }
 
-        // 2. Got (虹色) (音量大幅アップ: 0.6)
         function playGotSound() {
             initAudio();
             if(!audioCtx) return;
@@ -490,7 +500,6 @@
             });
         }
 
-        // 3. Secret (黒) (音量大幅アップ: 0.7)
         function playSecretSound() {
             initAudio();
             if(!audioCtx) return;
@@ -509,7 +518,6 @@
             });
         }
 
-        // 4. BEAN / CRAFT (爆音＆超ド迫力: 0.9)
         function playBeanSound() {
             initAudio();
             if(!audioCtx) return;
@@ -538,13 +546,33 @@
             { name: "👑【CRAFT】ツブヨンコ・ソラマメ", chance: 0, rarity: "craft", label: "CRAFT-GOD", cost: 0, dps: 50000 }
         ];
 
-        const reqs = [
-            ["溶けかけの豆", "加熱えだまめ"],
-            ["加熱えだまめ", "ビーン・マシン"],
-            ["エダマメ・マシン"],
-            ["Beans soramame"],
-            ["ツブヨンコ・エダまめ"]
+        // 30分ごとに切り替わるクラフトレシピリスト（画像のデザイン形式に対応）
+        const craftRecipes = [
+            {
+                type: "char_medal",
+                charName: "エダマメ・マシン",
+                medalType: "national",
+                medalCount: 3,
+                result: { name: "VIPエダマメ・マシン", rarity: "got", dps: 500, label: "VIP", cost: 0 },
+                descTop: "エダマメ・マシン ＆ 国家予算メダル 3こ",
+                descResult: "VIPエダマメ・マシン"
+            },
+            {
+                type: "char_char",
+                char1: "ツブヨンコ・エダまめ",
+                char2: "【BEAN】ジャック・ソラマメ",
+                result: { name: "👑【CRAFT】ツブヨンコ・ソラマメ", rarity: "craft", dps: 50000, label: "CRAFT-GOD", cost: 0 },
+                descTop: "ツブヨンコ・エダまめ ＆ ジャック・ソラマメ",
+                descResult: "👑【CRAFT】ツブヨンコ・ソラマメ"
+            }
         ];
+
+        function getCurrentRecipe() {
+            const now = new Date();
+            const totalMinutes = now.getHours() * 60 + now.getMinutes();
+            const recipeIndex = Math.floor(totalMinutes / 30) % craftRecipes.length;
+            return craftRecipes[recipeIndex];
+        }
 
         function drawNormal(rackMultiplier = 1) {
             let modifiedChars = chars.filter(c => c.chance > 0).map(c => {
@@ -663,17 +691,16 @@
             document.getElementById('coin-display').innerText = Math.floor(coins);
             document.getElementById('inv-max').innerText = invMax;
             document.getElementById('inv-count').innerText = inventory.length;
-            document.getElementById('rev-lv').innerText = revLv;
+            document.getElementById('rich-medal-count').innerText = richMedals;
+            document.getElementById('national-medal-count').innerText = nationalMedals;
             
             let totalDps = inventory.reduce((sum, item) => sum + item.dps, 0);
             document.getElementById('dps-display').innerText = totalDps;
 
-            const reqDisplay = document.getElementById('req-display');
-            if (revLv >= 5) {
-                reqDisplay.innerText = "【リバースMAX達成！これ以上の進化はありません】";
-            } else {
-                reqDisplay.innerText = "次の素材: " + reqs[revLv].join(" ＋ ");
-            }
+            // クラフト表示を画像のデザイン通りに反映
+            const recipe = getCurrentRecipe();
+            document.getElementById('craft-top-text').innerText = recipe.descTop;
+            document.getElementById('craft-result-text').innerText = recipe.descResult;
 
             const invDiv = document.getElementById('inventory');
             if (inventory.length === 0) {
@@ -720,63 +747,94 @@
             saveGame();
         }
 
-        function attemptCraft() {
-            const idx1 = inventory.findIndex(i => i.name.includes("ツブヨンコ・エダまめ"));
-            const idx2 = inventory.findIndex(i => i.name.includes("ジャック・ソラマメ"));
-
-            if (idx1 !== -1 && idx2 !== -1) {
-                if (idx1 > idx2) {
-                    inventory.splice(idx1, 1);
-                    inventory.splice(idx2, 1);
-                } else {
-                    inventory.splice(idx2, 1);
-                    inventory.splice(idx1, 1);
-                }
-
-                const craftResult = chars.find(c => c.name.includes("ツブヨンコ・ソラマメ"));
-                inventory.push({ ...craftResult });
-
-                playBeanSound();
-                alert("👑 クラフト大成功！！最強の『ツブヨンコ・ソラマメ』が誕生しました！！");
+        function expandInventory() {
+            let cost = invMax * 10000;
+            if (coins >= cost) {
+                coins -= cost;
+                invMax += 5;
+                alert("🎉 インベントリの枠を拡張しました！（上限: " + invMax + "個）");
                 updateDisplay();
                 saveGame();
             } else {
-                alert("❌ クラフト素材が足りません！\nインベントリに「ツブヨンコ・エダまめ」と「ジャック・ソラマメ」の両方が必要です。");
+                alert(`❌ ゴールドが足りません！（必要: ${cost}G）`);
             }
         }
 
-        function attemptReverse() {
-            if (revLv >= 5) {
-                alert("✨ リバースは既に限界（Lv.5）に達しています！");
-                return;
-            }
-
-            let needed = reqs[revLv];
-            let canReverse = true;
-
-            for (let reqName of needed) {
-                const foundIndex = inventory.findIndex(i => i.name.includes(reqName));
-                if (foundIndex === -1) {
-                    canReverse = false;
-                    break;
-                }
-            }
-
-            if (canReverse) {
-                needed.forEach(reqName => {
-                    const foundIndex = inventory.findIndex(i => i.name.includes(reqName));
-                    if (foundIndex !== -1) {
-                        inventory.splice(foundIndex, 1);
-                    }
-                });
-
-                revLv++;
-                invMax += 2;
-                alert("🎉 リバース成功！インベントリ上限が +2 されました！（現在上限: " + invMax + "）");
+        function buyRichMedal() {
+            let cost = 500000;
+            if (coins >= cost) {
+                coins -= cost;
+                richMedals += 1;
+                alert("💎 富豪メダルを購入しました！");
                 updateDisplay();
                 saveGame();
             } else {
-                alert("❌ 素材が足りません！\n現在の必要素材: " + needed.join(" と "));
+                alert("❌ ゴールドが足りません！（必要: 500,000G）");
+            }
+        }
+
+        function buyNationalMedal() {
+            let cost = 10000000;
+            if (coins >= cost) {
+                coins -= cost;
+                nationalMedals += 1;
+                alert("👑 国家予算メダルを購入しました！");
+                updateDisplay();
+                saveGame();
+            } else {
+                alert("❌ ゴールドが足りません！（必要: 10,000,000G）");
+            }
+        }
+
+        function attemptCraft() {
+            const recipe = getCurrentRecipe();
+
+            if (recipe.type === "char_medal") {
+                const charIndex = inventory.findIndex(i => i.name.includes(recipe.charName));
+                const hasEnoughMedal = (nationalMedals >= recipe.medalCount);
+
+                if (charIndex !== -1 && hasEnoughMedal) {
+                    if (inventory.length >= invMax) {
+                        alert("⚠ インベントリが満タンのため、クラフトできません！");
+                        return;
+                    }
+                    inventory.splice(charIndex, 1);
+                    nationalMedals -= recipe.medalCount;
+
+                    inventory.push({ ...recipe.result });
+                    playBeanSound();
+                    alert(`👑 クラフト大成功！！『${recipe.result.name}』が誕生しました！！`);
+                    updateDisplay();
+                    saveGame();
+                } else {
+                    alert(`❌ 素材が足りません！\nインベントリに「${recipe.charName}」と国家予算メダル${recipe.medalCount}こが必要です。`);
+                }
+            } 
+            else if (recipe.type === "char_char") {
+                const idx1 = inventory.findIndex(i => i.name.includes(recipe.char1));
+                const idx2 = inventory.findIndex(i => i.name.includes(recipe.char2));
+
+                if (idx1 !== -1 && idx2 !== -1) {
+                    if (inventory.length >= invMax) {
+                        alert("⚠ インベントリが満タンのため、クラフトできません！");
+                        return;
+                    }
+                    if (idx1 > idx2) {
+                        inventory.splice(idx1, 1);
+                        inventory.splice(idx2, 1);
+                    } else {
+                        inventory.splice(idx2, 1);
+                        inventory.splice(idx1, 1);
+                    }
+
+                    inventory.push({ ...recipe.result });
+                    playBeanSound();
+                    alert(`👑 クラフト大成功！！『${recipe.result.name}』が誕生しました！！`);
+                    updateDisplay();
+                    saveGame();
+                } else {
+                    alert(`❌ クラフト用のキャラクター素材が足りません！\n「${recipe.char1}」と「${recipe.char2}」が必要です。`);
+                }
             }
         }
 
@@ -786,19 +844,16 @@
                     localStorage.removeItem('soramameGameData');
                     coins = 500000;
                     inventory = [];
-                    revLv = 0;
                     invMax = 10;
+                    richMedals = 0;
+                    nationalMedals = 0;
                     currentChar = null;
-                    alert("🗑️ セーブデータを初期化しました（所持金50万G）。");
+                    alert("🗑️ セーブデータを初期化しました。");
                 }
             }
 
             adminForceChar = document.getElementById('admin-target-char').value;
             adminForceMutant = document.getElementById('admin-mutant-check').checked;
-            
-            let selectedRev = parseInt(document.getElementById('admin-rev-select').value);
-            revLv = selectedRev;
-            invMax = 10 + (revLv * 2);
 
             if (document.getElementById('admin-rich-check').checked) {
                 coins += 1000000;
